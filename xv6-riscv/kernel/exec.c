@@ -38,7 +38,7 @@ exec(char *path, char **argv)
   } else {
     p->ondemand = true;
   }
-  
+
   if (p->ondemand == true) {
     print_ondemand_proc(path);
   }
@@ -74,12 +74,17 @@ exec(char *path, char **argv)
     if(ph.vaddr % PGSIZE != 0)
       goto bad;
 
-    uint64 sz1;
-    if((sz1 = uvmalloc(pagetable, sz, ph.vaddr + ph.memsz, flags2perm(ph.flags))) == 0)
-      goto bad;
-    sz = sz1;
-    if(loadseg(pagetable, ph.vaddr, ip, ph.off, ph.filesz) < 0)
-      goto bad;
+    if(p->ondemand!=true){
+      uint64 sz1;
+      if((sz1 = uvmalloc(pagetable, sz, ph.vaddr + ph.memsz, flags2perm(ph.flags))) == 0)
+        goto bad;
+      sz = sz1;
+      if(loadseg(pagetable, ph.vaddr, ip, ph.off, ph.filesz) < 0)
+        goto bad;
+    }else{
+      sz = ph.vaddr+ph.memsz;
+    }
+
   }
   iunlockput(ip);
   end_op();
