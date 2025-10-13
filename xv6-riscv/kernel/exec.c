@@ -6,7 +6,6 @@
 #include "proc.h"
 #include "defs.h"
 #include "elf.h"
-#include <string.h>
 
 // static 
 int loadseg(pde_t *, uint64, struct inode *, uint, uint);
@@ -34,7 +33,7 @@ exec(char *path, char **argv)
   struct proc *p = myproc();
 
   /* CSE 536: (2.1) Check on-demand status. */
-  if (strcmp(path, "init") == 0 ||strcmp(path, "sh") == 0 ) {
+  if (strncmp(path, "init",4) == 0 ||strncmp(path, "sh",2) == 0 ) {
     p->ondemand = false;
   } else {
     p->ondemand = true;
