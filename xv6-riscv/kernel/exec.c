@@ -83,7 +83,9 @@ exec(char *path, char **argv)
         goto bad;
     }else{
       print_skip_section(path, ph.vaddr, ph.memsz);
-      sz = ph.vaddr+ph.memsz;
+      uint64 top = ph.vaddr + ph.memsz;
+      if (top > sz)
+        sz = top;
     }
 
   }
