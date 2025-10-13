@@ -33,6 +33,12 @@ exec(char *path, char **argv)
   struct proc *p = myproc();
 
   /* CSE 536: (2.1) Check on-demand status. */
+  if (strcmp(path, "init") == 0 ||strcmp(path, "sh") == 0 ) {
+    p->ondemand = false;
+  } else {
+    p->ondemand = true;
+  }
+  
   if (p->ondemand == true) {
     print_ondemand_proc(path);
   }
