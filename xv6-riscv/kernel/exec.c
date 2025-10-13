@@ -82,6 +82,7 @@ exec(char *path, char **argv)
       if(loadseg(pagetable, ph.vaddr, ip, ph.off, ph.filesz) < 0)
         goto bad;
     }else{
+      print_skip_section(path, ph.vaddr, ph.memsz);
       sz = ph.vaddr+ph.memsz;
     }
 
