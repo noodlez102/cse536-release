@@ -83,7 +83,7 @@ exec(char *path, char **argv)
         goto bad;
     }else{
       print_skip_section(path, ph.vaddr, ph.memsz);
-      sz = ph.vaddr+ph.memsz;
+      sz = ph.vaddr + ph.memsz;
     }
 
   }
