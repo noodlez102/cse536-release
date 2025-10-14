@@ -67,6 +67,9 @@ usertrap(void)
     intr_on();
 
     syscall();
+  } else if(r_scause()==0xC){
+    print("Sent to page fault handler");
+    page_fault_handler();
   } else if((which_dev = devintr()) != 0){
     // ok
   } else {
