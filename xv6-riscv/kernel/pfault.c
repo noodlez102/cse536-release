@@ -80,9 +80,9 @@ void page_fault_handler(void)
 
     /* Find faulting address. */
     uint64 faulting_addr = r_stval();
-    printf("Pre shifted faulting addr %x\n",faulting_addr);
+    printf("Pre shifted faulting addr %p\n",faulting_addr);
     faulting_addr = (faulting_addr >> 12) << 12;
-    printf("Post shifted faulting addr %x\n",faulting_addr);
+    printf("Post shifted faulting addr %p\n",faulting_addr);
     print_page_fault(p->name, faulting_addr);
 
     /* Check if the fault address is a heap page. Use p->heap_tracker */
