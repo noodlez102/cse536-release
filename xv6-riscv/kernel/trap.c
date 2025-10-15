@@ -68,7 +68,7 @@ usertrap(void)
 
     syscall();
   } else if(r_scause()==12||r_scause()==13 ||r_scause()==15){
-    printf("Sent to page fault handler\n");
+    // printf("Sent to page fault handler\n");
     page_fault_handler();
   } else if((which_dev = devintr()) != 0){
     // ok
