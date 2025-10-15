@@ -132,8 +132,9 @@ void page_fault_handler(void)
         
         if(faulting_addr>= ph.vaddr && faulting_addr< ph.vaddr+ph.memsz){
             uint64 sz1;
-            if((sz1 = uvmalloc(pagetable, sz, ph.vaddr + ph.memsz, flags2perm(ph.flags))) == 0)
+            if((sz1 = uvmalloc(pagetable, sz, faulting_addr + ph.memsz, flags2perm(ph.flags))) == 0){
                 goto bad;
+            }
             sz = sz1;
             if(loadseg(pagetable, faulting_addr, ip, ph.off, ph.filesz) < 0)
                 goto bad;
