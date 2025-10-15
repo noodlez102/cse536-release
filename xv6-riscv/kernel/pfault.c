@@ -111,32 +111,20 @@ void page_fault_handler(void)
     if(readi(ip, 0, (uint64)&elf, 0, sizeof(elf)) != sizeof(elf))
         goto bad;
 
-    if(elf.magic != ELF_MAGIC)
-        goto bad;
-
-    if((pagetable = proc_pagetable(p)) == 0)
-        goto bad;
-
     // Load program into memory.
     for(int i=0, off=elf.phoff; i<elf.phnum; i++, off+=sizeof(ph)){
         if(readi(ip, 0, (uint64)&ph, off, sizeof(ph)) != sizeof(ph))
         goto bad;
         if(ph.type != ELF_PROG_LOAD)
         continue;
-        if(ph.memsz < ph.filesz)
-        goto bad;
-        if(ph.vaddr + ph.memsz < ph.vaddr)
-        goto bad;
-        if(ph.vaddr % PGSIZE != 0)
-        goto bad;
         
         if(faulting_addr>= ph.vaddr && faulting_addr< ph.vaddr+ph.memsz){
             uint64 sz1;
-            if((sz1 = uvmalloc(pagetable, faulting_addr, faulting_addr + ph.memsz, flags2perm(ph.flags))) == 0){
+            if((sz1 = uvmalloc(p->pagetable, faulting_addr, faulting_addr + PGSIZE, flags2perm(ph.flags))) == 0){
                 goto bad;
             }
             sz = sz1;
-            if(loadseg(pagetable, faulting_addr, ip, ph.off + (faulting_addr - ph.vaddr), ph.filesz) < 0)
+            if(loadseg(p->pagetable, faulting_addr, ip, ph.off + (faulting_addr - ph.vaddr), PGSIZE) < 0)
                 goto bad;
             print_load_seg(faulting_addr,ph.off, ph.memsz);
             iunlockput(ip);
@@ -145,6 +133,8 @@ void page_fault_handler(void)
         }
     }
     /* Go to out, since the remainder of this code is for the heap. */
+    iunlockput(ip);
+    end_op();
     goto out;
 
 heap_handle:
