@@ -76,7 +76,7 @@ void page_fault_handler(void)
     struct proc *p = myproc();
     struct inode *ip;
     struct elfhdr elf;
-    pagetable_t pagetable = 0, oldpagetable;
+    pagetable_t pagetable = 0;
     struct proghdr ph;
     uint64 sz=0;
 
@@ -92,7 +92,7 @@ void page_fault_handler(void)
     print_page_fault(p->name, faulting_addr);
 
     /* Check if the fault address is a heap page. Use p->heap_tracker */
-    if (true) {
+    if (false) {
         goto heap_handle;
     }
 
@@ -173,5 +173,5 @@ bad:
         iunlockput(ip);
         end_op();
     }
-    return -1;
+    return ;
 }
