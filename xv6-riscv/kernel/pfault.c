@@ -140,6 +140,7 @@ void page_fault_handler(void)
                 goto bad;
             print_load_seg(faulting_addr,ph.off, ph.memsz);
             iunlockput(ip);
+            end_op();
             goto out;
         }
     }
