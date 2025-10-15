@@ -74,6 +74,12 @@ void page_fault_handler(void)
 {
     /* Current process struct */
     struct proc *p = myproc();
+    struct inode *ip;
+    struct elfhdr elf;
+    pagetable_t pagetable = 0, oldpagetable;
+    struct proghdr ph;
+    uint64 sz=0;
+
 
     /* Track whether the heap page should be brought back from disk or not. */
     bool load_from_disk = false;
@@ -86,13 +92,54 @@ void page_fault_handler(void)
     print_page_fault(p->name, faulting_addr);
 
     /* Check if the fault address is a heap page. Use p->heap_tracker */
-    if (true) {
+    if (false) {
         goto heap_handle;
     }
 
     /* If it came here, it is a page from the program binary that we must load. */
     print_load_seg(faulting_addr, 0, 0);
 
+    begin_op();
+
+    if((ip = namei(p->name)) == 0){
+        end_op();
+        return -1;
+    }
+    ilock(ip);
+
+    // Check ELF header
+    if(readi(ip, 0, (uint64)&elf, 0, sizeof(elf)) != sizeof(elf))
+        goto bad;
+
+    if(elf.magic != ELF_MAGIC)
+        goto bad;
+
+    if((pagetable = proc_pagetable(p)) == 0)
+        goto bad;
+
+    // Load program into memory.
+    for(int i=0, off=elf.phoff; i<elf.phnum; i++, off+=sizeof(ph)){
+        if(readi(ip, 0, (uint64)&ph, off, sizeof(ph)) != sizeof(ph))
+        goto bad;
+        if(ph.type != ELF_PROG_LOAD)
+        continue;
+        if(ph.memsz < ph.filesz)
+        goto bad;
+        if(ph.vaddr + ph.memsz < ph.vaddr)
+        goto bad;
+        if(ph.vaddr % PGSIZE != 0)
+        goto bad;
+        
+        if(faulting_addr>= ph.vaddr && faulting_addr< ph.vaddr+ph.memsz){
+            uint64 sz1;
+            if((sz1 = uvmalloc(pagetable, sz, ph.vaddr + ph.memsz, flags2perm(ph.flags))) == 0)
+                goto bad;
+            sz = sz1;
+            if(loadseg(pagetable, ph.vaddr, ip, ph.off, ph.filesz) < 0)
+                goto bad;
+            print_load_seg(faulting_addr,ph.off, ph.memsz);
+        }
+    }
     /* Go to out, since the remainder of this code is for the heap. */
     goto out;
 
@@ -118,4 +165,13 @@ out:
     /* Flush stale page table entries. This is important to always do. */
     sfence_vma();
     return;
+
+bad:
+    if(pagetable)
+        proc_freepagetable(pagetable, sz);
+    if(ip){
+        iunlockput(ip);
+        end_op();
+    }
+    return -1;
 }
