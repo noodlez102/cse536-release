@@ -97,13 +97,13 @@ void page_fault_handler(void)
     }
 
     /* If it came here, it is a page from the program binary that we must load. */
-    print_load_seg(faulting_addr, 0, 0);
+    // print_load_seg(faulting_addr, 0, 0);
 
     begin_op();
 
     if((ip = namei(p->name)) == 0){
         end_op();
-        return -1;
+        return;
     }
     ilock(ip);
 
@@ -135,9 +135,11 @@ void page_fault_handler(void)
             if((sz1 = uvmalloc(pagetable, sz, ph.vaddr + ph.memsz, flags2perm(ph.flags))) == 0)
                 goto bad;
             sz = sz1;
-            if(loadseg(pagetable, ph.vaddr, ip, ph.off, ph.filesz) < 0)
+            if(loadseg(pagetable, faulting_addr, ip, ph.off, ph.filesz) < 0)
                 goto bad;
             print_load_seg(faulting_addr,ph.off, ph.memsz);
+            iunlockput(ip);
+            return;
         }
     }
     /* Go to out, since the remainder of this code is for the heap. */
