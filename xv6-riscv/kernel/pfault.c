@@ -141,7 +141,6 @@ void page_fault_handler(void)
             print_load_seg(faulting_addr,ph.off, ph.memsz);
             iunlockput(ip);
             end_op();
-            proc_freepagetable(pagetable, sz);
             goto out;
         }
     }
