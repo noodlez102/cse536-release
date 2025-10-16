@@ -147,7 +147,7 @@ heap_handle:
     }
 
     /* 2.3: Map a heap page into the process' address space. (Hint: check growproc) */
-    if((sz = uvmalloc(p->pagetable, sz, p->sz+ ph.memsz, PTE_W)) == 0) {
+    if((sz = uvmalloc(p->pagetable, p->sz, p->sz + ph.filesz, PTE_W)) == 0) {
       return -1;
     }
     p->sz=sz;
