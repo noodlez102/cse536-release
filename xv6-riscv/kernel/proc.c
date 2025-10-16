@@ -279,17 +279,22 @@ growproc(int n)
 
   /* CSE 536: (2.3) Instead of allocating pages, make these allocations
    * on-demand. Also, keep track of all allocated heap pages. 
-   */
-  if(p->ondemand){ //might have to do something more here idk
-    return 0;
-  }
-  /* CSE 536: For simplicity, I've made all allocations at page-level. */
+   */  
   n = PGROUNDUP(n);
-
   sz = p->sz;
+
+  if(p->ondemand){ //might have to do something more here idk
+    int npages = (PGROUNDUP(sz)+n - PGROUNDUP(sz)) / PGSIZE;
+    track_heap(p,n,npages);
+    p->sz=sz+n;
+    print_skip_heap_region(p->name, p->sz,npages);
+    return 0;
+  } 
+  /* CSE 536: For simplicity, I've made all allocations at page-level. */
+
   if(n > 0){
     if((sz = uvmalloc(p->pagetable, sz, sz + n, PTE_W)) == 0) {
-      return -1;
+      return;
     }
   } else if(n < 0){
     sz = uvmdealloc(p->pagetable, sz, sz + n);
