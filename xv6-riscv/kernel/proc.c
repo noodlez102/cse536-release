@@ -287,14 +287,14 @@ growproc(int n)
     int npages = (PGROUNDUP(sz)+n - PGROUNDUP(sz)) / PGSIZE;
     track_heap(p,n,npages);
     p->sz=sz+n;
-    print_skip_heap_region(p->name, PGROUNDUP(sz) ,npages); //p->sz isn't the right thing to put there
+    print_skip_heap_region(p->name, (sz>>12)<<12 ,npages); //p->sz isn't the right thing to put there
     return 0;
   } 
   /* CSE 536: For simplicity, I've made all allocations at page-level. */
 
   if(n > 0){
     if((sz = uvmalloc(p->pagetable, sz, sz + n, PTE_W)) == 0) {
-      return;
+      return -1;
     }
   } else if(n < 0){
     sz = uvmdealloc(p->pagetable, sz, sz + n);
