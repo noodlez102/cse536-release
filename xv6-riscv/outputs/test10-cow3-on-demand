@@ -1,0 +1,16 @@
+Ondemand process creation (proc: test10-cow3)
+Skipping program section loading (proc: test10-cow3, addr: 0, size: 4096)
+Skipping program section loading (proc: test10-cow3, addr: 1000, size: 32)
+----------------------------------------
+#PF: Proc (test10-cow3), Page (0)
+LOAD: Addr (0), SEG: (1000), SIZE (4096)
+Running Test10-CoW
+Skipping heap region allocation (proc: test10-cow3, addr: 4000, npages: 5)
+----------------------------------------
+#PF: Proc (test10-cow3), Page (3000)
+COW: Proc (test10-cow3) PID (4) Addr (3000)
+PID (4) Exiting
+----------------------------------------
+#PF: Proc (test10-cow3), Page (3000)
+COW: Proc (test10-cow3) PID (3) Addr (3000)
+PID (3) Exiting
