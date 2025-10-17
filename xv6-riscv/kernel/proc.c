@@ -284,7 +284,7 @@ growproc(int n)
   sz = p->sz;
 
   if(p->ondemand){ //might have to do something more here idk
-    int npages = (PGROUNDUP(sz)+n - PGROUNDUP(sz)) / PGSIZE;
+    int npages = n / PGSIZE;
     track_heap(p,sz,npages);
     p->sz=sz+n;
     print_skip_heap_region(p->name, PGROUNDUP(sz) ,npages); //p->sz isn't the right thing to put there

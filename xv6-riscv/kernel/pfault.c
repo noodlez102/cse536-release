@@ -150,11 +150,11 @@ heap_handle:
     /* 2.3: Map a heap page into the process' address space. (Hint: check growproc) */
     char *mem = kalloc();
     if (mem == 0)
-        panic("out of memory during heap page fault");
+        goto bad;
 
     memset(mem, 0, PGSIZE);
     if (mappages(p->pagetable, ht->addr, PGSIZE, (uint64)mem, PTE_W|PTE_R|PTE_U) != 0)
-        panic("mappages failed in heap fault");
+        goto bad;
 
     ht->loaded = 1;
     ht->last_load_time = ticks;
