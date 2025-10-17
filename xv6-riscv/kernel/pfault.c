@@ -148,14 +148,9 @@ heap_handle:
     }
 
     /* 2.3: Map a heap page into the process' address space. (Hint: check growproc) */
-    char *mem = kalloc();
-    if (mem == 0)
+    if(sz=uvmalloc(p->pagetable,ht->addr,ht->addr+PGSIZE,PTE_W)==0){
         goto bad;
-
-    memset(mem, 0, PGSIZE);
-    if (mappages(p->pagetable, ht->addr, PGSIZE, (uint64)mem, PTE_W|PTE_R|PTE_U) != 0)
-        goto bad;
-
+    }
     ht->loaded = 1;
     ht->last_load_time = ticks;
     /* 2.4: Update the last load time for the   loaded heap page in p->heap_tracker. */
