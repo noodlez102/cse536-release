@@ -78,9 +78,7 @@ void evict_page_to_disk(struct proc* p) {
 
 
     /* Unmap swapped out page */
-    printf("before uvmunmap\n");
-    uvmunmap(p,victim->addr,1,1);
-    printf("after uvmunmap\n");
+    uvmunmap(p,PGROUNDDOWN(victim->addr),1,1);
 
     /* Update the resident heap tracker. */
     p->resident_heap_pages--;
