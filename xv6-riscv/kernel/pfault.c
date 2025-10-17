@@ -59,8 +59,10 @@ void evict_page_to_disk(struct proc* p) {
     print_evict_page(victim->addr, blockno);
     /* Read memory from the user to kernel memory first. */
     char *kernel_page = kalloc();
+    if (!kernel_page)
+        printf("kalloc failed during eviction");
     if (copyin(p->pagetable, kernel_page, victim->addr, PGSIZE) < 0) {
-        printf("copyin failed in evict_page_to_disk");
+        printf("copyin failed in evict_page_to_disk\n");
     }
 
     //if error check here
@@ -113,7 +115,7 @@ void retrieve_page_from_disk(struct proc* p, uint64 uvaddr) {
 
     /* Copy from temp kernel page to uvaddr (use copyout) */
     if (copyout(p->pagetable, uvaddr, kernel_page, PGSIZE) < 0)
-        printf("retrieve_page_from_disk: copyout failed");
+        printf("retrieve_page_from_disk: copyout failed\n");
     kfree(kernel_page);
 
 }
