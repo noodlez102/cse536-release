@@ -152,7 +152,7 @@ heap_handle:
         goto bad;
     }
     ht->loaded = 1;
-    ht->last_load_time = ticks;
+    ht->last_load_time = read_current_timestamp();
     /* 2.4: Update the last load time for the   loaded heap page in p->heap_tracker. */
 
     /* 2.4: Heap page was swapped to disk previously. We must load it from disk. */
