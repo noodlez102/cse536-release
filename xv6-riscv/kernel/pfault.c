@@ -79,7 +79,7 @@ void page_fault_handler(void)
     pagetable_t pagetable = 0;
     struct proghdr ph;
     uint64 sz=0;
-
+    struct heap_tracker_t *ht = 0;
 
     /* Track whether the heap page should be brought back from disk or not. */
     bool load_from_disk = false;
@@ -94,6 +94,7 @@ void page_fault_handler(void)
     /* Check if the fault address is a heap page. Use p->heap_tracker */
     for(int i=0; i<MAXHEAP;i++){
         if (p->heap_tracker[i].addr==faulting_addr) {
+            ht=&p->heap_tracker[i];
             goto heap_handle;
         }
     }
@@ -147,11 +148,17 @@ heap_handle:
     }
 
     /* 2.3: Map a heap page into the process' address space. (Hint: check growproc) */
-    if((sz = uvmalloc(p->pagetable, p->sz, faulting_addr+PGSIZE, PTE_W)) == 0) {
-      return -1;
-    }
-    p->sz=faulting_addr+PGSIZE;
-    /* 2.4: Update the last load time for the loaded heap page in p->heap_tracker. */
+    char *mem = kalloc();
+    if (mem == 0)
+        panic("out of memory during heap page fault");
+
+    memset(mem, 0, PGSIZE);
+    if (mappages(p->pagetable, ht->addr, PGSIZE, (uint64)mem, PTE_W|PTE_R|PTE_U) != 0)
+        panic("mappages failed in heap fault");
+
+    ht->loaded = 1;
+    ht->last_load_time = ticks;
+    /* 2.4: Update the last load time for the   loaded heap page in p->heap_tracker. */
 
     /* 2.4: Heap page was swapped to disk previously. We must load it from disk. */
     if (load_from_disk) {
