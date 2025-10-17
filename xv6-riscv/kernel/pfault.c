@@ -37,36 +37,84 @@ void init_psa_regions(void)
 /* Evict heap page to disk when resident pages exceed limit */
 void evict_page_to_disk(struct proc* p) {
     /* Find free block */
-    int blockno = 0;
+    int blockno = -1;
+    for (int i = 0; i < PSASIZE - 3; i++) {
+        if (!psa_tracker[i] && !psa_tracker[i+1] && !psa_tracker[i+2] && !psa_tracker[i+3]) {
+            blockno = i;
+            psa_tracker[i]=psa_tracker[i+1]=psa_tracker[i+2]=psa_tracker[i+3]= true;
+            break;
+        }
+    }
+    if (blockno == -1) {
+        printf("no free PSA blocks\n");
+    }
     /* Find victim page using FIFO. */
+    struct heap_tracker_t *victim = &p->heap_tracker[0];
+    for(int i =1; i<MAXHEAP;i++){
+        if(p->heap_tracker[i].last_load_time < victim->last_load_time){
+            victim= &p->heap_tracker[i];
+        }
+    }
     /* Print statement. */
-    print_evict_page(0, 0);
+    print_evict_page(victim->addr, blockno);
     /* Read memory from the user to kernel memory first. */
-    
+    char *kernel_page = kalloc();
+    if (copyin(p->pagetable, kernel_page, victim->addr, PGSIZE) < 0) {
+        printf("copyin failed in evict_page_to_disk");
+    }
+
+    //if error check here
+
     /* Write to the disk blocks. Below is a template as to how this works. There is
      * definitely a better way but this works for now. :p */
-    struct buf* b;
-    b = bread(1, PSASTART+(blockno));
+    for(int i=0;i<4;i++){
+        struct buf* b;
+        b = bread(1, PSASTART+i+blockno);
         // Copy page contents to b.data using memmove.
-    bwrite(b);
-    brelse(b);
+        memmove(b->data, kernel_page + (i * 1024), 1024);
+        bwrite(b);
+        brelse(b);
+    }
+
 
     /* Unmap swapped out page */
+    uvmunmap(p,victim->addr,1,1);
     /* Update the resident heap tracker. */
+    p->resident_heap_pages--;
+    victim->startblock=blockno;
+    kfree(kernel_page);
 }
 
 /* Retrieve faulted page from disk. */
 void retrieve_page_from_disk(struct proc* p, uint64 uvaddr) {
     /* Find where the page is located in disk */
-
+    struct heap_tracker_t *retrieval = &p->heap_tracker[0];
+    for(int i =1; i<MAXHEAP;i++){
+        if(p->heap_tracker[i].addr == uvaddr){
+            retrieval= &p->heap_tracker[i];
+            break;
+        }
+    }
     /* Print statement. */
-    print_retrieve_page(0, 0);
+    print_retrieve_page(retrieval->addr, retrieval->startblock);
 
     /* Create a kernel page to read memory temporarily into first. */
-    
+    char *kernel_page = kalloc();
+
     /* Read the disk block into temp kernel page. */
+    for(int i=0;i<4;i++){
+        struct buf* b;
+        b = bread(1, PSASTART+i+retrieval->startblock);
+        memmove(b->data, kernel_page + (i * 1024), 1024);
+        bwrite(b);
+        brelse(b);
+    }
 
     /* Copy from temp kernel page to uvaddr (use copyout) */
+    if (copyout(p->pagetable, uvaddr, kernel_page, PGSIZE) < 0)
+        printf("retrieve_page_from_disk: copyout failed");
+    kfree(kernel_page);
+
 }
 
 
@@ -145,15 +193,17 @@ heap_handle:
     /* 2.4: Check if resident pages are more than heap pages. If yes, evict. */
     if (p->resident_heap_pages == MAXRESHEAP) {
         evict_page_to_disk(p);
+        load_from_disk=true;
     }
 
     /* 2.3: Map a heap page into the process' address space. (Hint: check growproc) */
     if(sz=uvmalloc(p->pagetable,ht->addr,ht->addr+PGSIZE,PTE_W)==0){
         goto bad;
     }
+
+    /* 2.4: Update the last load time for the loaded heap page in p->heap_tracker. */
     ht->loaded = 1;
     ht->last_load_time = read_current_timestamp();
-    /* 2.4: Update the last load time for the   loaded heap page in p->heap_tracker. */
 
     /* 2.4: Heap page was swapped to disk previously. We must load it from disk. */
     if (load_from_disk) {
