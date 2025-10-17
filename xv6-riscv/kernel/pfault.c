@@ -56,7 +56,7 @@ void evict_page_to_disk(struct proc* p) {
         }
     }
     /* Print statement. */
-    print_evict_page(victim->addr, blockno);
+    print_evict_page(PGROUNDDOWN(victim->addr), blockno);
     /* Read memory from the user to kernel memory first. */
     char *kernel_page = kalloc();
     if (copyin(p->pagetable, kernel_page, victim->addr, PGSIZE) < 0) {
