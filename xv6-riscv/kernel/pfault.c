@@ -152,10 +152,10 @@ void page_fault_handler(void)
     print_page_fault(p->name, faulting_addr);
 
     //if it's copy on write
-    if(p->cow_enabled){
-        copy_on_write();
-        goto out;
-    }
+    // if(p->cow_enabled){
+    //     copy_on_write();
+    //     goto out;
+    // }
 
     /* Check if the fault address is a heap page. Use p->heap_tracker */
     for(int i=0; i<MAXHEAP;i++){
