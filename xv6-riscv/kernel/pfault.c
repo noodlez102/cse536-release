@@ -49,7 +49,7 @@ void evict_page_to_disk(struct proc* p) {
         printf("no free PSA blocks\n");
     }
     /* Find victim page using FIFO. */
-    struct heap_tracker_t *victim-NULL;
+    struct heap_tracker_t *victim=NULL;
     for(int i =0; i<MAXHEAP;i++){
         if(victim==NULL && p->heap_tracker[i].loaded==1){
             victim=&p->heap_tracker[i];
