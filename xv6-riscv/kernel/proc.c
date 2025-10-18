@@ -316,22 +316,33 @@ fork(int cow_enabled)
   if((np = allocproc()) == 0){
     return -1;
   }
-
+  acquire(&np->lock);
   /* CSE 536: (3.1) Modify fork() to handle CoW */
-  
   // Currently fork() does not handle the case for when CoW is enable
   // You will have to implement the same
-
-  // Set the appropriate metadata to track a CoW group
-
+  if(cow_enabled==1){
+    // Set the appropriate metadata to track a CoW group
+    np->cow_enabled=1;
+    np->cow_group=p->pid;
+    p->cow_enabled=1;
+    p->cow_group=p->pid;
   // implement and call the uvm_copy() function defined in cow.c
 
-  // Copy user memory from parent to child.
-  if(uvmcopy(p->pagetable, np->pagetable, p->sz) < 0){
-    freeproc(np);
-    release(&np->lock);
-    return -1;
+    if(uvmcopy_cow(p->pagetable, np->pagetable, p->sz) < 0){
+      freeproc(np);
+      release(&np->lock);
+      return -1;
+    }
+  }else{
+    // Copy user memory from parent to child.
+    if(uvmcopy(p->pagetable, np->pagetable, p->sz) < 0){
+      freeproc(np);
+      release(&np->lock);
+      return -1;
+    }
   }
+
+
   np->sz = p->sz;
 
   // copy saved user registers.

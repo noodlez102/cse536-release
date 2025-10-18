@@ -92,14 +92,41 @@ void cow_init() {
 }
 
 int uvmcopy_cow(pagetable_t old, pagetable_t new, uint64 sz) {
-    
+
     /* CSE 536: (2.6.1) Handling Copy-on-write fork() */
 
     // Copy user vitual memory from old(parent) to new(child) process
 
     // Map pages as Read-Only in both the processes
 
+    pte_t *pte;
+    uint64 pa, i;
+    uint flags;
+    char *mem;
+
+    for(i = 0; i < sz; i += PGSIZE){
+        if((pte = walk(old, i, 0)) == 0)
+            continue;   // page table entry hasn't been allocated
+        if((*pte & PTE_V) == 0)
+            continue;   // physical page hasn't been allocated
+        pa = PTE2PA(*pte);
+        flags = PTE_FLAGS(*pte);
+        if((mem = kalloc()) == 0)
+            goto err;
+        if(flags & PTE_W){// this is the part that makes it read only
+            *pte &= ~PTE_W;    
+        }
+        memmove(mem, (char*)pa, PGSIZE);
+        if(mappages(new, i, PGSIZE, (uint64)mem, flags & ~PTE_W) != 0){
+            kfree(mem);
+            goto err;
+        }
+    }
     return 0;
+
+err:
+    uvmunmap(new, 0, i / PGSIZE, 1);
+    return -1;
 }
 
 void copy_on_write() {
