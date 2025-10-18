@@ -125,9 +125,9 @@ void retrieve_page_from_disk(struct proc* p, uint64 uvaddr) {
     retrieval->loaded=1;
     retrieval->last_load_time=read_current_timestamp();
     retrieval->startblock=-1;
-    
+
     kfree(kernel_page);
-    kree(user_page);
+    kfree(user_page);
 
 }
 
