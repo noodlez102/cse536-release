@@ -159,7 +159,7 @@ void page_fault_handler(void)
             if (is_shmem(p->cow_group, pa)) {
                 // print before entering COW (you said this didn't print before)
                 printf("COW: Proc (%s) PID (%d) Addr (%p)\n", p->name, p->pid, faulting_addr);
-                copy_on_write(p, va);   // pass aligned VA and proc
+                copy_on_write();   // pass aligned VA and proc
                 goto out;
             }
         }
