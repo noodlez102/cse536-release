@@ -328,13 +328,11 @@ fork(int cow_enabled)
     p->cow_group=p->pid;
 
     int group_id = p->pid;
-    acquire(&cow_lock);
     if(get_cow_group_count(group_id) == 0){
         cow_group_init(group_id);
     }
     incr_cow_group_count(group_id);
     incr_cow_group_count(group_id); 
-    release(&cow_lock);
     // add_shem(group_id, np->)
     // implement and call the uvm_copy() function defined in cow.c
     if(uvmcopy_cow(p->pagetable, np->pagetable, p->sz) < 0){

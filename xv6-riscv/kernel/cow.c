@@ -127,7 +127,7 @@ int uvmcopy_cow(pagetable_t old, pagetable_t new, uint64 sz) {
     
     }
     acquire(&cow_lock);
-    add_shmem(p->cow_group, pa);
+    add_shmem(p->cow_group, mem);
     release(&cow_lock);
     return 0;
 
