@@ -329,18 +329,19 @@ fork(int cow_enabled)
         group_id = p->pid;  
     }
     
-    np->cow_enabled=1;
-    np->cow_group=group_id;
-    p->cow_enabled=1;
-    p->cow_group=group_id;
-
-    if((new_group=get_cow_group_count(group_id)) == 0){
-        cow_group_init(group_id);
+    if(get_cow_group(group_id) == 0){
+      cow_group_init(group_id);
     }
-    if(get_cow_group_count(group_id) == 0) {
-      incr_cow_group_count(group_id); // Parent
-    }    
-    incr_cow_group_count(group_id); 
+    if(!p->cow_enabled) {
+      p->cow_enabled = 1;
+      p->cow_group = group_id;
+      incr_cow_group_count(group_id);
+    }
+          
+      np->cow_enabled = 1;
+      np->cow_group = group_id;
+      incr_cow_group_count(group_id);
+
     // add_shem(group_id, np->)
     // implement and call the uvm_copy() function defined in cow.c
     if(uvmcopy_cow(p->pagetable, np->pagetable, p->sz) < 0){
