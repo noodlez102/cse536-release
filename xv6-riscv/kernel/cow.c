@@ -103,6 +103,7 @@ int uvmcopy_cow(pagetable_t old, pagetable_t new, uint64 sz) {
     uint64 pa, i;
     uint flags;
     char *mem;
+    struct proc *p = myproc();
 
     for(i = 0; i < sz; i += PGSIZE){
         if((pte = walk(old, i, 0)) == 0)
@@ -116,12 +117,16 @@ int uvmcopy_cow(pagetable_t old, pagetable_t new, uint64 sz) {
         
         flags &= ~PTE_W;// this is the part that makes it read only
         *pte &= ~PTE_W;    
-        
+    
         memmove(mem, (char*)pa, PGSIZE);
         if(mappages(new, i, PGSIZE, (uint64)mem, flags) != 0){
             kfree(mem);
             goto err;
         }
+        acquire(&cow_lock);
+        add_shmem(p->cow_group, pa);
+        release(&cow_lock);
+    
     }
     return 0;
 

@@ -151,6 +151,12 @@ void page_fault_handler(void)
     // printf("Post shifted faulting addr %p\n",faulting_addr);
     print_page_fault(p->name, faulting_addr);
 
+    //if it's copy on write
+    if(p->cow_enabled && is_shem(p->cow_group,faulting_addr)){
+        copy_on_write();
+        goto out;
+    }
+
     /* Check if the fault address is a heap page. Use p->heap_tracker */
     for(int i=0; i<MAXHEAP;i++){
         if (p->heap_tracker[i].addr==faulting_addr) {
