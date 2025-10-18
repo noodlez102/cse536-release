@@ -137,9 +137,40 @@ err:
 
 void copy_on_write() {
     /* CSE 536: (2.6.2) Handling Copy-on-write */
-
-    // Allocate a new page 
+    struct proc *p = myproc();
+    uint64 faulting_addr = r_stval();
+    faulting_addr = (faulting_addr >> 12) << 12;
     
+    pte_t *pte = walk(p->pagetable, faulting_addr, 0);
+    if(pte == 0 || (*pte & PTE_V) == 0){
+        printf("copy_on_write: invalid page\n");
+        return;
+    }
+
+    uint64 pa = PTE2PA(*pte); 
+    int group_id = p->cow_group;
+
+    if(!is_shmem(group_id, pa)){
+        printf("copy_on_write: page not shared\n");
+        return;
+    }
+
+    char *new_mem = kalloc();
+    if(new_mem == 0){
+        panic("copy_on_write: kalloc failed");
+        return;
+    }
+
+    memmove(new_mem, (char*)pa, PGSIZE);
+
+    uint flags = PTE_FLAGS(*pte) | PTE_W; 
+    if(mappages(p->pagetable, faulting_addr, PGSIZE, (uint64)new_mem, flags) != 0){
+        kfree(new_mem);
+        panic("copy_on_write: mappages failed");
+        return;
+    }
+
+    print_copy_on_write(faulting_addr, pa, new_mem);
     // Copy contents from the shared page to the new page
 
     // Map the new page in the faulting process's page table with write permissions

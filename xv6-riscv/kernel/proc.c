@@ -321,7 +321,6 @@ fork(int cow_enabled)
   // Currently fork() does not handle the case for when CoW is enable
   // You will have to implement the same
   if(cow_enabled==1){
-    cow_init();
     // Set the appropriate metadata to track a CoW group
     np->cow_enabled=1;
     np->cow_group=p->pid;
