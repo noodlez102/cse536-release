@@ -316,7 +316,7 @@ fork(int cow_enabled)
   if((np = allocproc()) == 0){
     return -1;
   }
-  acquire(&np->lock);
+  // acquire(&np->lock);
   /* CSE 536: (3.1) Modify fork() to handle CoW */
   // Currently fork() does not handle the case for when CoW is enable
   // You will have to implement the same
