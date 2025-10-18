@@ -198,7 +198,7 @@ heap_handle:
     /* 2.4: Check if resident pages are more than heap pages. If yes, evict. */
     if (p->resident_heap_pages == MAXRESHEAP) {
         evict_page_to_disk(p);
-        load_from_disk=true;
+        // load_from_disk=true;
     }
 
     /* 2.3: Map a heap page into the process' address space. (Hint: check growproc) */
