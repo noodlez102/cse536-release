@@ -153,6 +153,7 @@ void page_fault_handler(void)
 
     //if it's copy on write
     if(p->cow_enabled && ((r_scause() & 0xF) == 0xD)){
+        printf("gotten to copy on write"\n);
         copy_on_write();
         goto out;
     }
