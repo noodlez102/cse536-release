@@ -171,7 +171,7 @@ void copy_on_write() {
     memmove(new_mem, (char*)pa, PGSIZE);
     uint flags = PTE_FLAGS(*pte) | PTE_W | PTE_V;
 
-    uvmunmap(p->pagetable, faulting_addr, 1, 0);
+    uvmunmap(p->pagetable, faulting_addr, 1, 1);
 
     if(mappages(p->pagetable, faulting_addr, PGSIZE, (uint64)new_mem, flags) != 0){
         kfree(new_mem);
