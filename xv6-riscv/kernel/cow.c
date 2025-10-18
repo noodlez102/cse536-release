@@ -112,22 +112,22 @@ int uvmcopy_cow(pagetable_t old, pagetable_t new, uint64 sz) {
             continue;   // physical page hasn't been allocated
         pa = PTE2PA(*pte);
         flags = PTE_FLAGS(*pte);
-        if((mem = kalloc()) == 0)
-            goto err;
+        // if((mem = kalloc()) == 0)
+        //     goto err;
         
         flags &= ~PTE_W;// this is the part that makes it read only
         *pte &= ~PTE_W;    
     
-        memmove(mem, (char*)pa, PGSIZE);
-        if(mappages(new, i, PGSIZE, (uint64)mem, flags) != 0){
-            kfree(mem);
+        // memmove(mem, (char*)pa, PGSIZE);
+        if(mappages(new, i, PGSIZE, pa, flags) != 0){
+            // kfree(mem);
             goto err;
         }
 
     
     }
     acquire(&cow_lock);
-    add_shmem(p->cow_group, mem);
+    add_shmem(p->cow_group, pa);
     release(&cow_lock);
     return 0;
 
