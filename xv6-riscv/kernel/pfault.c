@@ -96,10 +96,10 @@ void evict_page_to_disk(struct proc* p) {
 /* Retrieve faulted page from disk. */
 void retrieve_page_from_disk(struct proc* p, uint64 uvaddr) {
     /* Find where the page is located in disk */
-    struct heap_tracker_t *retrieval = &p->heap_tracker[0];
-    for(int i =1; i<MAXHEAP;i++){
-        if(p->heap_tracker[i].addr == uvaddr){
-            retrieval= &p->heap_tracker[i];
+    struct heap_tracker_t *retrieval = NULL;
+    for (int i = 0; i < MAXHEAP; i++) {
+        if (p->heap_tracker[i].addr == uvaddr) {
+            retrieval = &p->heap_tracker[i];
             break;
         }
     }
@@ -113,15 +113,21 @@ void retrieve_page_from_disk(struct proc* p, uint64 uvaddr) {
     for(int i=0;i<4;i++){
         struct buf* b;
         b = bread(1, PSASTART+i+retrieval->startblock);
-        memmove(b->data, kernel_page + (i * 1024), 1024);
-        bwrite(b);
+        memmove(kernel_page + (i * 1024), b->data, 1024);
         brelse(b);
     }
 
     /* Copy from temp kernel page to uvaddr (use copyout) */
-    if (copyout(p->pagetable, uvaddr, kernel_page, PGSIZE) < 0)
+    char *user_page = kalloc();
+    
+    if (copyout(p->pagetable, user_page, kernel_page, PGSIZE) < 0)
         printf("retrieve_page_from_disk: copyout failed\n");
+    retrieval->loaded=1;
+    retrieval->last_load_time=read_current_timestamp();
+    retrieval->startblock=-1;
+    
     kfree(kernel_page);
+    kree(user_page);
 
 }
 
