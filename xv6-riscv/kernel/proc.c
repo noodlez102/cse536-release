@@ -322,12 +322,18 @@ fork(int cow_enabled)
   // You will have to implement the same
   if(cow_enabled){
     // Set the appropriate metadata to track a CoW group
+    int group_id;
+    if(p->cow_enabled && p->cow_group != -1) {
+        group_id = p->cow_group;  
+    } else {
+        group_id = p->pid;  
+    }
+    
     np->cow_enabled=1;
-    np->cow_group=p->pid;
+    np->cow_group=group_id;
     p->cow_enabled=1;
-    p->cow_group=p->pid;
+    p->cow_group=group_id;
 
-    int group_id = p->pid;
     if((new_group=get_cow_group_count(group_id)) == 0){
         cow_group_init(group_id);
     }
