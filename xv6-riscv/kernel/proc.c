@@ -321,35 +321,25 @@ fork(int cow_enabled)
   // Currently fork() does not handle the case for when CoW is enable
   // You will have to implement the same
   if(cow_enabled){
-    // Otherwise, create a new group using parent's PID
-    int group_id;
-    if(p->cow_enabled && p->cow_group != -1) {
-        group_id = p->cow_group;  // Use existing group
-    } else {
-        group_id = p->pid;  // Create new group
-    }
-        
-    // Initialize the CoW group if it doesn't exist yet
-    if(get_cow_group(group_id) == 0){
+    // Set the appropriate metadata to track a CoW group
+    np->cow_enabled=1;
+    np->cow_group=p->pid;
+    p->cow_enabled=1;
+    p->cow_group=p->pid;
+
+    int group_id = p->pid;
+    if((new_group=get_cow_group_count(group_id)) == 0){
         cow_group_init(group_id);
     }
-    
-    // If parent wasn't in a CoW group yet, add it now
-    if(!p->cow_enabled) {
-        p->cow_enabled = 1;
-        p->cow_group = group_id;
-        incr_cow_group_count(group_id); // Count the parent
-    }
-    
-    // Set child's metadata
-    np->cow_enabled = 1;
-    np->cow_group = group_id;
-    incr_cow_group_count(group_id); // Count the child
-        
-    // Use CoW copy instead of regular copy
+    if(get_cow_group_count(group_id) == 0) {
+      incr_cow_group_count(group_id); // Parent
+    }    
+    incr_cow_group_count(group_id); 
+    // add_shem(group_id, np->)
+    // implement and call the uvm_copy() function defined in cow.c
     if(uvmcopy_cow(p->pagetable, np->pagetable, p->sz) < 0){
       freeproc(np);
-      // release(&np->lock); // Don't release - we'll do it at the end
+      release(&np->lock);
       return -1;
     }
 
