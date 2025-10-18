@@ -120,7 +120,7 @@ void retrieve_page_from_disk(struct proc* p, uint64 uvaddr) {
     /* Copy from temp kernel page to uvaddr (use copyout) */
     char *user_page = kalloc();
     
-    if (copyout(p->pagetable, user_page, kernel_page, PGSIZE) < 0)
+    if (copyout(p->pagetable, user_page, retrieval->startblock, PGSIZE) < 0)
         printf("retrieve_page_from_disk: copyout failed\n");
     retrieval->loaded=1;
     retrieval->last_load_time=read_current_timestamp();
