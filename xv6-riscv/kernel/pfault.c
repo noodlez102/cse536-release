@@ -158,7 +158,7 @@ void page_fault_handler(void)
             uint64 pa = PTE2PA(*pte);
             if (is_shmem(p->cow_group, pa)) {
                 // print before entering COW (you said this didn't print before)
-                printf("COW: Proc (%s) PID (%d) Addr (%p)\n", p->name, p->pid, va);
+                printf("COW: Proc (%s) PID (%d) Addr (%p)\n", p->name, p->pid, faulting_addr);
                 copy_on_write(p, va);   // pass aligned VA and proc
                 goto out;
             }
