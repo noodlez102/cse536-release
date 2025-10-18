@@ -152,17 +152,10 @@ void page_fault_handler(void)
     print_page_fault(p->name, faulting_addr);
 
     //if it's copy on write
-    if ((r_scause() & 0xff) == 0xD && p->cow_enabled) {   // store/AMO page fault only
-        pte_t *pte = walk(p->pagetable, faulting_addr, 0);
-        if (pte && (*pte & PTE_V)) {
-            uint64 pa = PTE2PA(*pte);
-            if (is_shmem(p->cow_group, pa)) {
-                // print before entering COW (you said this didn't print before)
-                printf("COW: Proc (%s) PID (%d) Addr (%p)\n", p->name, p->pid, faulting_addr);
-                copy_on_write();   // pass aligned VA and proc
-                goto out;
-            }
-        }
+    if(p->cow_enabled && ((r_scause() & 0xff) == 0xD)){
+        printf("gotten to copy on write\n");
+        copy_on_write();
+        goto out;
     }
 
     /* Check if the fault address is a heap page. Use p->heap_tracker */
