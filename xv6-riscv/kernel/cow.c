@@ -177,7 +177,7 @@ void copy_on_write() {
         return;
     }
 
-    print_copy_on_write(p, faulting_addr);
+    print_copy_on_write(p, new_mem);
     // Copy contents from the shared page to the new page
 
     // Map the new page in the faulting process's page table with write permissions
