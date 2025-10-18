@@ -171,7 +171,7 @@ void copy_on_write() {
     memmove(new_mem, (char*)pa, PGSIZE);
     uint flags = PTE_FLAGS(*pte) | PTE_W | PTE_V;
 
-    uvmunmap(p->pagetable, faulting_addr, 1, 1);
+    uvmunmap(p->pagetable, faulting_addr, 1, 0);
 
     if(mappages(p->pagetable, faulting_addr, PGSIZE, (uint64)new_mem, flags) != 0){
         kfree(new_mem);
@@ -183,10 +183,4 @@ void copy_on_write() {
     // Copy contents from the shared page to the new page
 
     // Map the new page in the faulting process's page table with write permissions
-    acquire(&cow_lock);
-    int ref_count = get_cow_group_count(group_id);
-    if(ref_count == 1) {
-        kfree((void*)pa);
-    }
-    release(&cow_lock);
 }
