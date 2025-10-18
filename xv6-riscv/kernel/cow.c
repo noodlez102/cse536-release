@@ -114,14 +114,16 @@ int uvmcopy_cow(pagetable_t old, pagetable_t new, uint64 sz) {
         flags = PTE_FLAGS(*pte);
         // if((mem = kalloc()) == 0)
         //     goto err;
-        
-        if(flags & PTE_W) {
-            flags &= ~PTE_W;
-            *pte &= ~PTE_W;
-            
-            acquire(&cow_lock);
-            add_shmem(p->cow_group, pa);
-            release(&cow_lock);
+        int is_shared = is_shmem(p->cow_group, pa);
+        if(is_shared || flags & PTE_W) {
+            if(flags & PTE_W) {
+                flags &= ~PTE_W;
+                *pte &= ~PTE_W;
+                
+                acquire(&cow_lock);
+                add_shmem(p->cow_group, pa);
+                release(&cow_lock);
+            } 
         } 
     
         // memmove(mem, (char*)pa, PGSIZE);
