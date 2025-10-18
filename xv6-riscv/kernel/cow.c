@@ -113,11 +113,12 @@ int uvmcopy_cow(pagetable_t old, pagetable_t new, uint64 sz) {
         flags = PTE_FLAGS(*pte);
         if((mem = kalloc()) == 0)
             goto err;
-        if(flags & PTE_W){// this is the part that makes it read only
-            *pte &= ~PTE_W;    
-        }
+        
+        flags &= ~PTE_W;// this is the part that makes it read only
+        *pte &= ~PTE_W;    
+        
         memmove(mem, (char*)pa, PGSIZE);
-        if(mappages(new, i, PGSIZE, (uint64)mem, flags & ~PTE_W) != 0){
+        if(mappages(new, i, PGSIZE, (uint64)mem, flags) != 0){
             kfree(mem);
             goto err;
         }

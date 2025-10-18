@@ -311,7 +311,7 @@ fork(int cow_enabled)
   int i, pid;
   struct proc *np;
   struct proc *p = myproc();
-
+  struct cow_group *new_group;
   // Allocate process.
   if((np = allocproc()) == 0){
     return -1;
@@ -321,18 +321,26 @@ fork(int cow_enabled)
   // Currently fork() does not handle the case for when CoW is enable
   // You will have to implement the same
   if(cow_enabled==1){
+    cow_init();
     // Set the appropriate metadata to track a CoW group
     np->cow_enabled=1;
     np->cow_group=p->pid;
     p->cow_enabled=1;
     p->cow_group=p->pid;
-  // implement and call the uvm_copy() function defined in cow.c
-
+    int group_id = p->pid;
+    if(get_cow_group_count(group_id) == 0){
+        cow_group_init(group_id);
+    }
+    incr_cow_group_count(group_id);
+    incr_cow_group_count(group_id); 
+    // add_shem(group_id, np->)
+    // implement and call the uvm_copy() function defined in cow.c
     if(uvmcopy_cow(p->pagetable, np->pagetable, p->sz) < 0){
       freeproc(np);
       release(&np->lock);
       return -1;
     }
+
   }else{
     // Copy user memory from parent to child.
     if(uvmcopy(p->pagetable, np->pagetable, p->sz) < 0){
