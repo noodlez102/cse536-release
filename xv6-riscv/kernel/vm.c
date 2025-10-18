@@ -194,7 +194,6 @@ uvmunmap(pagetable_t pagetable, uint64 va, uint64 npages, int do_free)
       uint64 pa = PTE2PA(*pte);
       /* CSE 536: (2.6.1) Freeing Process Memory */
       // Make sure that the shared pages, belonging to a CoW group, are not freed 
-      printf("before ref\n");
       if(p->cow_enabled){
         int ref_count = get_cow_group_count(p->cow_group);
         if(ref_count==1){
