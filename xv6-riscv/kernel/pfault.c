@@ -11,6 +11,7 @@
 #include "sleeplock.h"
 #include "fs.h"
 #include "buf.h"
+#include "cow.c"
 
 int loadseg(pagetable_t pagetable, uint64 va, struct inode *ip, uint offset, uint sz);
 int flags2perm(int flags);
