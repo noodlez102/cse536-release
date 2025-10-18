@@ -152,6 +152,8 @@ void page_fault_handler(void)
     print_page_fault(p->name, faulting_addr);
 
     //if it's copy on write
+    uint64 scause = r_scause();
+    printf("scause value: 0x%lx, cow_enabled: %d\n", scause, p->cow_enabled);
     if(p->cow_enabled && (r_scause() == 0xD || r_scause() == 0xF)){
         printf("gotten to copy on write\n");
         copy_on_write();
