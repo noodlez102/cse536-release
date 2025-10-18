@@ -151,6 +151,9 @@ void page_fault_handler(void)
     for(int i=0; i<MAXHEAP;i++){
         if (p->heap_tracker[i].addr==faulting_addr) {
             ht=&p->heap_tracker[i];
+            if(ht->startblock>=0){
+                load_from_disk=true;
+            }
             goto heap_handle;
         }
     }
@@ -201,7 +204,6 @@ heap_handle:
     /* 2.4: Check if resident pages are more than heap pages. If yes, evict. */
     if (p->resident_heap_pages == MAXRESHEAP) {
         evict_page_to_disk(p);
-        // load_from_disk=true;
     }
 
     /* 2.3: Map a heap page into the process' address space. (Hint: check growproc) */
