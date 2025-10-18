@@ -207,7 +207,7 @@ heap_handle:
     }
 
     /* 2.4: Update the last load time for the loaded heap page in p->heap_tracker. */
-    printf("Victim addr %d\n",ht->addr);
+    printf("Victim addr %x\n",ht->addr);
     ht->loaded = 1;
     ht->last_load_time = read_current_timestamp();
 
