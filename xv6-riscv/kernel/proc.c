@@ -320,7 +320,7 @@ fork(int cow_enabled)
   /* CSE 536: (3.1) Modify fork() to handle CoW */
   // Currently fork() does not handle the case for when CoW is enable
   // You will have to implement the same
-  if(cow_enabled){
+  if(cow_enabled|| p->cow_enabled){
     // Set the appropriate metadata to track a CoW group
     int group_id;
     if(p->cow_enabled && p->cow_group != -1) {
