@@ -166,16 +166,20 @@ void copy_on_write() {
         panic("copy_on_write: kalloc failed");
         return;
     }
-
+    printf("before memove\n");
     memmove(new_mem, (char*)pa, PGSIZE);
     uint flags = PTE_FLAGS(*pte) | PTE_W | PTE_V;
+    printf("before uvmunmap\n");
+
     uvmunmap(p->pagetable, faulting_addr, 1, 0);
+    printf("before mappages\n");
 
     if(mappages(p->pagetable, faulting_addr, PGSIZE, (uint64)new_mem, flags) != 0){
         kfree(new_mem);
         panic("copy_on_write: mappages failed");
         return;
     }
+    printf("before print copy on write\n");
 
     print_copy_on_write(faulting_addr, pa, new_mem);
     // Copy contents from the shared page to the new page
