@@ -181,7 +181,7 @@ void copy_on_write() {
     }
     printf("before print copy on write\n");
 
-    print_copy_on_write(faulting_addr, pa, new_mem);
+    print_copy_on_write(p, new_mem);
     // Copy contents from the shared page to the new page
 
     // Map the new page in the faulting process's page table with write permissions
