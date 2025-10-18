@@ -51,7 +51,7 @@ void evict_page_to_disk(struct proc* p) {
     /* Find victim page using FIFO. */
     struct heap_tracker_t *victim = &p->heap_tracker[0];
     for(int i =1; i<MAXHEAP;i++){
-        if((p->heap_tracker[i].last_load_time < victim->last_load_time) && (victim->loaded==0)){
+        if((p->heap_tracker[i].last_load_time < victim->last_load_time) && (victim->loaded==1)){
             victim= &p->heap_tracker[i];
         }
     }
@@ -207,6 +207,7 @@ heap_handle:
     }
 
     /* 2.4: Update the last load time for the loaded heap page in p->heap_tracker. */
+    printf("Victim addr %d\n",ht->addr);
     ht->loaded = 1;
     ht->last_load_time = read_current_timestamp();
 
