@@ -102,7 +102,7 @@ int uvmcopy_cow(pagetable_t old, pagetable_t new, uint64 sz) {
     pte_t *pte;
     uint64 pa, i;
     uint flags;
-    char *mem;
+    // char *mem;
     struct proc *p = myproc();
 
     for(i = 0; i < sz; i += PGSIZE){
@@ -124,7 +124,6 @@ int uvmcopy_cow(pagetable_t old, pagetable_t new, uint64 sz) {
             goto err;
         }
 
-    
     }
     acquire(&cow_lock);
     add_shmem(p->cow_group, pa);
@@ -151,10 +150,13 @@ void copy_on_write() {
     uint64 pa = PTE2PA(*pte); 
     int group_id = p->cow_group;
 
+    acquire(&cow_lock);
     if(!is_shmem(group_id, pa)){
+        release(&cow_lock);
         printf("copy_on_write: page not shared\n");
         return;
     }
+    release(&cow_lock);
 
     char *new_mem = kalloc();
     if(new_mem == 0){
@@ -163,8 +165,9 @@ void copy_on_write() {
     }
 
     memmove(new_mem, (char*)pa, PGSIZE);
+    uvmunmap(p->pagetable, faulting_addr, 1, 0);
 
-    uint flags = PTE_FLAGS(*pte) | PTE_W; 
+    uint flags = PTE_FLAGS(*pte) | PTE_W | PTE_V;
     if(mappages(p->pagetable, faulting_addr, PGSIZE, (uint64)new_mem, flags) != 0){
         kfree(new_mem);
         panic("copy_on_write: mappages failed");
@@ -175,4 +178,10 @@ void copy_on_write() {
     // Copy contents from the shared page to the new page
 
     // Map the new page in the faulting process's page table with write permissions
+    acquire(&cow_lock);
+    int ref_count = get_cow_group_count(group_id);
+    if(ref_count == 1) {
+        kfree((void*)pa);
+    }
+    release(&cow_lock);
 }
