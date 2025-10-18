@@ -83,7 +83,7 @@ void evict_page_to_disk(struct proc* p) {
 
 
     /* Unmap swapped out page */
-    uvmunmap(p->pagetable,victim->addr,1,1);
+    uvmunmap(p->pagetable,victim->addr,1,0);
 
     /* Update the resident heap tracker. */
     p->resident_heap_pages--;
