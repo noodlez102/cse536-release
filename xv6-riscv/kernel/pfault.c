@@ -11,7 +11,6 @@
 #include "sleeplock.h"
 #include "fs.h"
 #include "buf.h"
-#include "cow.c"
 
 int loadseg(pagetable_t pagetable, uint64 va, struct inode *ip, uint offset, uint sz);
 int flags2perm(int flags);
@@ -153,7 +152,7 @@ void page_fault_handler(void)
     print_page_fault(p->name, faulting_addr);
 
     //if it's copy on write
-    if(p->cow_enabled && is_shem(p->cow_group,faulting_addr)){
+    if(p->cow_enabled){
         copy_on_write();
         goto out;
     }
