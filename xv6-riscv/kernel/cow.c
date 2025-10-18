@@ -123,11 +123,12 @@ int uvmcopy_cow(pagetable_t old, pagetable_t new, uint64 sz) {
             kfree(mem);
             goto err;
         }
-        acquire(&cow_lock);
-        add_shmem(p->cow_group, pa);
-        release(&cow_lock);
+
     
     }
+    acquire(&cow_lock);
+    add_shmem(p->cow_group, pa);
+    release(&cow_lock);
     return 0;
 
 err:
@@ -140,7 +141,7 @@ void copy_on_write() {
     struct proc *p = myproc();
     uint64 faulting_addr = r_stval();
     faulting_addr = (faulting_addr >> 12) << 12;
-    
+
     pte_t *pte = walk(p->pagetable, faulting_addr, 0);
     if(pte == 0 || (*pte & PTE_V) == 0){
         printf("copy_on_write: invalid page\n");
