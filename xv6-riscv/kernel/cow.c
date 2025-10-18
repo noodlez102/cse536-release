@@ -142,7 +142,7 @@ void copy_on_write() {
     /* CSE 536: (2.6.2) Handling Copy-on-write */
     struct proc *p = myproc();
     uint64 faulting_addr = r_stval();
-    faulting_addr = (faulting_addr >> 12) << 12;
+    faulting_addr = PGROUNDDOWN(faulting_addr);
 
     pte_t *pte = walk(p->pagetable, faulting_addr, 0);
     if(pte == 0 || (*pte & PTE_V) == 0){
