@@ -119,8 +119,12 @@ void retrieve_page_from_disk(struct proc* p, uint64 uvaddr) {
 
     /* Copy from temp kernel page to uvaddr (use copyout) */
     char *user_page = kalloc();
-    
-    if (copyout(p->pagetable, user_page, retrieval->addr, PGSIZE) < 0)
+    if (mappages(p->pagetable, uvaddr, PGSIZE, (uint64)kernel_page, PTE_W | PTE_U | PTE_R) < 0) {
+        printf("retrieve_page_from_disk: mappages failed\n");
+        kfree(kernel_page);
+        return;
+    }
+    if (copyout(p->pagetable, uvaddr, kernel_page, PGSIZE) < 0)
         printf("retrieve_page_from_disk: copyout failed\n");
     retrieval->loaded=1;
     retrieval->last_load_time=read_current_timestamp();
