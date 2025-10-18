@@ -85,7 +85,7 @@ void evict_page_to_disk(struct proc* p) {
     /* Update the resident heap tracker. */
     p->resident_heap_pages--;
     victim->startblock=blockno;
-    victim->loaded=1;
+    victim->loaded=0;
 
     kfree(kernel_page);
 }
