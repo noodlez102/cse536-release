@@ -331,7 +331,9 @@ fork(int cow_enabled)
     if(get_cow_group_count(group_id) == 0){
         cow_group_init(group_id);
     }
-    incr_cow_group_count(group_id);
+    if(get_cow_group_count(group_id) == 0) {
+      incr_cow_group_count(group_id); // Parent
+    }    
     incr_cow_group_count(group_id); 
     // add_shem(group_id, np->)
     // implement and call the uvm_copy() function defined in cow.c
