@@ -14,7 +14,7 @@
 
 int loadseg(pagetable_t pagetable, uint64 va, struct inode *ip, uint offset, uint sz);
 int flags2perm(int flags);
-
+int count=0;
 /* CSE 536: (2.4) read current time. */
 uint64 read_current_timestamp() {
   uint64 curticks = 0;
@@ -143,7 +143,7 @@ void page_fault_handler(void)
 
     /* Track whether the heap page should be brought back from disk or not. */
     bool load_from_disk = false;
-
+    count++;
     /* Find faulting address. */
     uint64 faulting_addr = r_stval();
     // printf("Pre shifted faulting addr %p\n",faulting_addr);
@@ -155,7 +155,7 @@ void page_fault_handler(void)
     uint64 scause = r_scause();
     printf("scause value: 0x%x, cow_enabled: %d\n", scause, p->cow_enabled);
     // if(p->cow_enabled && (r_scause() == 0xD || r_scause() == 0xF)){
-    if(true){
+    if(count ==5){
         printf("gotten to copy on write\n");
         copy_on_write();
         goto out;
