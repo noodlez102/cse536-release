@@ -53,9 +53,8 @@
 
 // map kernel stacks beneath the trampoline,
 // each surrounded by invalid guard pages.
-#define KSTACKS_BELOW (PGSIZE * MAXTHREADS)
 // CSE 536: (Task 2.1.1): Update this macro to accept (pid, tid) and return a virtual address according to layout provided in the assignment instructions.
-#define KSTACK(p,tid) (TRAMPOLINE - KSTACKS_BELOW - (( (p) * MAXTHREADS + (tid) + 1) * 2 * PGSIZE))
+#define KSTACK(p,tid) (TRAMPOLINE - PGSIZE * MAXTHREADS - ((p)*MAXTHREADS+(tid)+1)* 2*PGSIZE)
 
 // User memory layout.
 // Address zero first:

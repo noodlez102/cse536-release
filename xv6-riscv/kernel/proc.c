@@ -36,6 +36,25 @@ void
 proc_mapstacks(pagetable_t kpgtbl)
 {
   // CSE 536: (Task 2.1.1) - Allocate and map MAXTHREADS kernel stacks for each process according to the instructions
+  struct proc *p;
+  int tid;
+
+  for(p = proc; p < &proc[NPROC]; p++) {
+    for(tid = 0; tid < MAXTHREADS; tid++) {
+      uint64 top = KSTACK((p - proc), tid);
+      uint64 stack_va = top + PGSIZE;
+
+      char *ka = kalloc();
+      if(ka == 0)
+        panic("kalloc for kstack failed");
+
+      memset(ka, 0, PGSIZE);
+      if(mappages(kpgtbl, stack_va, PGSIZE,
+                    (uint64)V2P(ka), PTE_R | PTE_W) != 0){
+          panic("proc_mapstacks: map failed");
+        }
+      }
+    }
 }
 
 // initialize the proc table.
@@ -136,6 +155,22 @@ found:
   t->state = USED;
 
   // CSE 536: (Task 2.1.1) - Allocate MAXTHREAD trapframes
+  for(int tid = 0; tid < MAXTHREADS; tid++) {
+    p->thread[tid].trapframe = (struct trapframe*)kalloc();
+    if(p->thread[tid].trapframe == 0) {
+      for(int j = 0; j < tid; j++) {
+        kfree(p->thread[j].trapframe);
+        p->thread[j].trapframe = 0;
+      }
+      release(&p->lock);
+      return 0;
+    }
+    memset(p->thread[tid].trapframe, 0, PGSIZE);
+  }
+
+
+  t->trapframe = p->thread[0].trapframe;
+  t->tid = 0;  
 
   // An empty user page table.
   p->pagetable = proc_pagetable(p);
