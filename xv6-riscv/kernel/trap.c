@@ -103,7 +103,7 @@ usertrapret(void)
   // set up trapframe values that uservec will need when
   // the process next traps into the kernel.
   mythread()->trapframe->kernel_satp = r_satp();         // kernel page table
-  mythread()->trapframe->kernel_sp = KSTACK(p->pid) + PGSIZE;
+  mythread()->trapframe->kernel_sp = KSTACK(p->pid, mythread()->tid) + PGSIZE;
   mythread()->trapframe->kernel_trap = (uint64)usertrap;
   mythread()->trapframe->kernel_hartid = r_tp();         // hartid for cpuid()
 

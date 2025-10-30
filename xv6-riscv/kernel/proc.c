@@ -149,7 +149,7 @@ found:
   // which returns to user space.
   memset(&(t->context), 0, sizeof(t->context));
   t->context.ra = (uint64)forkret;
-  t->context.sp = KSTACK(p->pid) + PGSIZE;
+  t->context.sp = KSTACK(p->pid,t->tid) + PGSIZE;
 
   return p;
 }
