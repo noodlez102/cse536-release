@@ -44,12 +44,12 @@ proc_mapstacks(pagetable_t kpgtbl)
       uint64 top = KSTACK((p - proc), tid);
       uint64 stack_va = top + PGSIZE;
 
-      char *ka = kalloc();
-      if(ka == 0)
+      char *mem = kalloc();
+      if(mem == 0)
         panic("kalloc for kstack failed");
 
-      memset(ka, 0, PGSIZE);
-      if(mappages(kpgtbl, stack_va, PGSIZE, ka, PTE_R | PTE_W) != 0){
+      memset(mem, 0, PGSIZE);
+      if(mappages(kpgtbl, stack_va, PGSIZE, (uint64)mem, PTE_R | PTE_W) != 0){
           panic("proc_mapstacks: map failed");
         }
       }
