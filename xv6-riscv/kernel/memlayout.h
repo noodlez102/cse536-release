@@ -55,7 +55,7 @@
 // each surrounded by invalid guard pages.
 
 // CSE 536: (Task 2.1.1): Update this macro to accept (pid, tid) and return a virtual address according to layout provided in the assignment instructions.
-#define KSTACK(p) (TRAMPOLINE - ((p)+1)* 2*PGSIZE)
+#define KSTACK(p,tid) (TRAMPOLINE - ((p)+1)* 2*PGSIZE * (1+(tid)))
 
 // User memory layout.
 // Address zero first:
@@ -68,4 +68,4 @@
 //   TRAMPOLINE (the same page as in the kernel)
 
 // CSE 536: (Task 2.1.1): Update this macro to accept (tid) and return the virtual address according to layout provided in the assignment instructions.
-#define TRAPFRAME (TRAMPOLINE - PGSIZE)
+#define TRAPFRAME(tid) (TRAMPOLINE - PGSIZE* (1+(tid)))
