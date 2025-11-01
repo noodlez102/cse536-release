@@ -36,7 +36,7 @@ void
 proc_mapstacks(pagetable_t kpgtbl)
 {
   // CSE 536: (Task 2.1.1) - Allocate and map MAXTHREADS kernel stacks for each process according to the instructions
-  // struct proc *p;
+  struct proc *p;
   int pid, tid;
   uint64 pa;
 
@@ -235,23 +235,13 @@ proc_pagetable(struct proc *p)
   }
 
   // CSE 536: (Task 2.1.1) - Map the MAXTHREAD trapframes right below the Trampoline as mentioned in the instructions
-  for (int tid = 0; tid < MAXTHREADS; tid++) {
-    uint64 tf_pa = (uint64)kalloc();
-    if (tf_pa == 0) {
-      if (tid > 0) {
-        uvmunmap(pagetable, TRAPFRAME(0), tid, 1); 
+  for(int i = 0; i < MAXTHREADS; i++) {
+    uint64 va = TRAMPOLINE - (i + 1) * PGSIZE;
+    if (mappages(pagetable, va, PGSIZE, (uint64)p->thread[i].trapframe, PTE_R | PTE_W) < 0) {
+      for(int j = 0; j < i; j++) {
+        uint64 va2 = TRAMPOLINE - (j + 1) * PGSIZE;
+        uvmunmap(pagetable, va2, 1, 0);
       }
-
-      uvmunmap(pagetable, TRAMPOLINE, 1, 0);
-      uvmfree(pagetable, 0);
-      return 0;
-    }
-    memset((void*)tf_pa, 0, PGSIZE);
-
-    if (mappages(pagetable, TRAPFRAME(tid), PGSIZE, tf_pa, PTE_R | PTE_W) != 0) {
-      kfree((void*)tf_pa);
-      uvmunmap(pagetable, TRAPFRAME(0), tid, 1);
-      uvmunmap(pagetable, TRAMPOLINE, 1, 0);
       uvmfree(pagetable, 0);
       return 0;
     }
