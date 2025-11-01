@@ -35,7 +35,7 @@ uservec:
         # (TRAPFRAME) in every process's user page table.
 
         # CSE 536: (Task 2.1.2) - Read the correct trapframe address from s11
-        li a0, s11
+        mv a0, s11
         
         # save the user registers in TRAPFRAME
         sd ra, 40(a0)
@@ -111,7 +111,7 @@ userret:
         sfence.vma zero, zero
 
         # CSE 536: (Task 2.1.2) - Read the correct trapframe address from s11
-        li a0, s11
+        mv a0, s11
 
         # restore all but a0 from TRAPFRAME
         ld ra, 40(a0)
