@@ -38,7 +38,7 @@ proc_mapstacks(pagetable_t kpgtbl)
   // CSE 536: (Task 2.1.1) - Allocate and map MAXTHREADS kernel stacks for each process according to the instructions
   struct proc *p;
   int tid;
-
+  
   for(p = proc; p < &proc[NPROC]; p++) {
     for(tid = 0; tid < MAXTHREADS; tid++) {
       uint64 top = KSTACK((p - proc), tid);
@@ -54,6 +54,7 @@ proc_mapstacks(pagetable_t kpgtbl)
         }
       }
     }
+    printf("passed proc_mapstacks\n");
 }
 
 // initialize the proc table.
