@@ -37,23 +37,21 @@ proc_mapstacks(pagetable_t kpgtbl)
 {
   // CSE 536: (Task 2.1.1) - Allocate and map MAXTHREADS kernel stacks for each process according to the instructions
   struct proc *p;
-  int tid;
+  int pid, tid;
+  uint64 pa;
 
-  for(p = proc; p < &proc[NPROC]; p++) {
-    for(tid = 0; tid < MAXTHREADS; tid++) {
-      uint64 top = KSTACK((p - proc), tid);
-      uint64 stack_va = top + PGSIZE;
-
-      char *mem = kalloc();
-      if(mem == 0)
-        panic("kalloc for kstack failed");
-
-      memset(mem, 0, PGSIZE);
-      if(mappages(kpgtbl, stack_va, PGSIZE, (uint64)mem, PTE_R | PTE_W) != 0){
-          panic("proc_mapstacks: map failed");
-        }
+  for (pid = 0; pid < NPROC; pid++) {
+    for (tid = 0; tid < MAXTHREADS; tid++) {
+      pa = (uint64)kalloc();
+      if (pa == 0) {
+        panic("proc_mapstacks: kalloc out of memory while allocating kernel stacks");
+      }
+      memset((void*)pa, 0, PGSIZE);
+      if (mappages(kpgtbl, KSTACK(pid, tid), PGSIZE, pa, PTE_R | PTE_W) != 0) {
+        panic("proc_mapstacks: mappages failed");
       }
     }
+  }
 }
 
 // initialize the proc table.
@@ -237,13 +235,23 @@ proc_pagetable(struct proc *p)
   }
 
   // CSE 536: (Task 2.1.1) - Map the MAXTHREAD trapframes right below the Trampoline as mentioned in the instructions
-  for(int i = 0; i < MAXTHREADS; i++) {
-    uint64 va = TRAMPOLINE - (i + 1) * PGSIZE;
-    if (mappages(pagetable, va, PGSIZE, (uint64)p->thread[i].trapframe, PTE_R | PTE_W) < 0) {
-      for(int j = 0; j < i; j++) {
-        uint64 va2 = TRAMPOLINE - (j + 1) * PGSIZE;
-        uvmunmap(pagetable, va2, 1, 0);
+  for (int tid = 0; tid < MAXTHREADS; tid++) {
+    uint64 tf_pa = (uint64)kalloc();
+    if (tf_pa == 0) {
+      if (tid > 0) {
+        uvmunmap(pagetable, TRAPFRAME(0), tid, 1); 
       }
+
+      uvmunmap(pagetable, TRAMPOLINE, 1, 0);
+      uvmfree(pagetable, 0);
+      return 0;
+    }
+    memset((void*)tf_pa, 0, PGSIZE);
+
+    if (mappages(pagetable, TRAPFRAME(tid), PGSIZE, tf_pa, PTE_R | PTE_W) != 0) {
+      kfree((void*)tf_pa);
+      uvmunmap(pagetable, TRAPFRAME(0), tid, 1);
+      uvmunmap(pagetable, TRAMPOLINE, 1, 0);
       uvmfree(pagetable, 0);
       return 0;
     }
