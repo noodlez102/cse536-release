@@ -82,7 +82,11 @@ exec(char *path, char **argv)
   // uint64 sz1;
 
   // CSE 536: (Task 2.1.1) - Allocate and map MAXTHREADS user stacks + guard pages according to the instructions
-
+  for (int i = 0; i < MAXTHREADS; i++) {
+      uint64 va_stack = TRAPFRAME(i);     
+      uint64 va_top = va_stack + PGSIZE;   
+      p->thread[i].trapframe->sp = va_top;
+  }
   sp = sz;
   stackbase = sp - PGSIZE;
 
@@ -126,7 +130,15 @@ exec(char *path, char **argv)
   p->thread[0].trapframe->epc = elf.entry;  // initial program counter = main
   
   // CSE 536: (Task 2.1.1) - set the correct user stack in the in each thread's trapframe
+ uint64 stacks_base = p->sz - (uint64)MAXTHREADS * 2 * PGSIZE;
 
+  for (int i = 0; i < MAXTHREADS; i++) {
+    uint64 stack_page = stacks_base + (uint64)(i * 2 + 1) * PGSIZE;
+    uint64 stack_top  = stack_page + PGSIZE;
+    p->thread[i].trapframe->sp = stack_top;
+
+  }
+  
   proc_freepagetable(oldpagetable, oldsz);
 
   return argc; // this ends up in a0, the first argument to main(argc, argv)
