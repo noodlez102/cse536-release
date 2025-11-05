@@ -153,7 +153,7 @@ found:
 
   // CSE 536: (Task 2.1.1) - Allocate MAXTHREAD trapframes
   for(int tid = 0; tid < MAXTHREADS; tid++) {
-    if(p->thread[tid].trapframe =((struct trapframe*)kalloc()) == 0) {
+    if((p->thread[tid].trapframe =((struct trapframe*)kalloc()))== 0) {
       freeproc(p);
       release(&p->lock);
       return 0;
