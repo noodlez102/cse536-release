@@ -37,21 +37,19 @@ proc_mapstacks(pagetable_t kpgtbl)
 {
   // CSE 536: (Task 2.1.1) - Allocate and map MAXTHREADS kernel stacks for each process according to the instructions
   struct proc *p;
-  int tid;
-  
-  for(p = proc; p < &proc[NPROC]; p++) {
-    for(tid = 0; tid < MAXTHREADS; tid++) {
-      uint64 top = KSTACK((p - proc), tid);
-      uint64 stack_va = top - PGSIZE;
+  int pid, tid;
 
-      char *mem = kalloc();
-      if(mem == 0)
-        panic("kalloc for kstack failed");
+  for (p = proc, pid = 0; p < &proc[NPROC]; p++, pid++) {
+    for (tid = 0; tid < MAXTHREADS; tid++) {
+      char *pa = kalloc();
+      if (pa == 0)
+        panic("proc_mapstacks: kalloc");
 
-      memset(mem, 0, PGSIZE);
-      if(mappages(kpgtbl, stack_va, PGSIZE, (uint64)mem, PTE_R | PTE_W) != 0){
-          panic("proc_mapstacks: map failed");
-      }
+      memset(pa, 0, PGSIZE);
+
+      uint64 va = KSTACK(pid, tid) - PGSIZE;
+
+      kvmmap(kpgtbl, va, (uint64)pa, PGSIZE, PTE_R | PTE_W);
     }
   }
 }
