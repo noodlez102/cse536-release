@@ -36,7 +36,7 @@ uservec:
 
         # CSE 536: (Task 2.1.2) - Read the correct trapframe address from s11
         mv a0, s11
-        
+
         # save the user registers in TRAPFRAME
         sd ra, 40(a0)
         sd sp, 48(a0)
@@ -112,7 +112,9 @@ userret:
 
         # CSE 536: (Task 2.1.2) - Read the correct trapframe address from s11
         mv a0, s11
-
+        ld s11, 248(a0)
+        csrw sscratch, s11
+        
         # restore all but a0 from TRAPFRAME
         ld ra, 40(a0)
         ld sp, 48(a0)

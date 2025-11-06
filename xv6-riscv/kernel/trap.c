@@ -130,7 +130,6 @@ usertrapret(void)
   // CSE 536: (Task 2.1.2) - Pass the address of the current thread's TRAPFRAME in s11
   mythread()->trapframe->s11 = TRAPFRAME(mythread()->tid);
   ((void (*)(uint64))trampoline_userret)(satp);
-
 }
 
 // interrupts and exceptions from kernel code go here via kernelvec,
