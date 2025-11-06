@@ -246,7 +246,7 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
 
   // CSE 536: (Task 2.1.1) - unmap and free all the trapframes
   for(int i = 0; i < MAXTHREADS; i++){
-    uint64 va = TRAMPOLINE - (i + 1) * PGSIZE;
+    uint64 va = TRAPFRAME(i);
     uvmunmap(pagetable, va, 1, 1); 
   }
 
