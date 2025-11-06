@@ -83,7 +83,6 @@ exec(char *path, char **argv)
 
   // CSE 536: (Task 2.1.1) - Allocate and map MAXTHREADS user stacks + guard pages according to the instructions
   for(int i = 0; i < MAXTHREADS; i++){
-    uint64 guard = sz;
     if(uvmalloc(pagetable, sz, sz + PGSIZE, 0) == 0)
       goto bad;
     sz += PGSIZE;
