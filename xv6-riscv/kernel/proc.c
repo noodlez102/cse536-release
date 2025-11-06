@@ -157,10 +157,6 @@ found:
     }
   }
 
-
-  t->trapframe = p->thread[0].trapframe;
-  t->tid = 0;  
-
   // An empty user page table.
   p->pagetable = proc_pagetable(p);
   if(p->pagetable == 0){
