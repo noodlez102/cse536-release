@@ -28,14 +28,14 @@ uservec:
 
         # save user a0 in sscratch so
         # a0 can be used to get at TRAPFRAME.
-        csrw sscratch, a0
+        csrw sscratch, a0       
 
         # each process has a separate p->trapframe memory area,
         # but it's mapped to the same virtual address
         # (TRAPFRAME) in every process's user page table.
 
         # CSE 536: (Task 2.1.2) - Read the correct trapframe address from s11
-        mv a0, s11
+        mv a0,s11
 
         # save the user registers in TRAPFRAME
         sd ra, 40(a0)
@@ -114,7 +114,7 @@ userret:
         mv a0, s11
         ld s11, 248(a0)
         csrw sscratch, s11
-        
+
         # restore all but a0 from TRAPFRAME
         ld ra, 40(a0)
         ld sp, 48(a0)
