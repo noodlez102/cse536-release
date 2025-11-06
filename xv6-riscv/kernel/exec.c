@@ -82,10 +82,17 @@ exec(char *path, char **argv)
   // uint64 sz1;
 
   // CSE 536: (Task 2.1.1) - Allocate and map MAXTHREADS user stacks + guard pages according to the instructions
-  for (int i = 0; i < MAXTHREADS; i++) {
-      uint64 va_stack = TRAPFRAME(i);     
-      uint64 va_top = va_stack + PGSIZE;   
-      p->thread[i].trapframe->sp = va_top;
+  for(int i = 0; i < MAXTHREADS; i++){
+    uint64 guard = sz;
+    if(uvmalloc(pagetable, sz, sz + PGSIZE, 0) == 0)
+      goto bad;
+    sz += PGSIZE;
+    uint64 stack = sz;
+    if(uvmalloc(pagetable, sz, sz + PGSIZE, PTE_W) == 0)
+      goto bad;
+    sz += PGSIZE;
+    if(p->thread[i].trapframe)
+      p->thread[i].trapframe->sp = stack + PGSIZE;
   }
   sp = sz;
   stackbase = sp - PGSIZE;
