@@ -244,7 +244,7 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
   for(int i = 0; i < MAXTHREADS; i++){
     if(p->thread[i].trapframe){
       uint64 va = TRAPFRAME(i);
-      uvmunmap(pagetable, va, 1, 1); 
+      uvmunmap(pagetable, va, 1, 0); 
       p->thread[i].trapframe=0;
     }
   }
