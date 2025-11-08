@@ -158,7 +158,14 @@ found:
     }
     memset(p->thread[tid].trapframe, 0, PGSIZE);
   }
+  t = &p->thread[0];
+  t->state = USED;
+  t->tid = 0; 
 
+  t->trapframe->kernel_trap  = (uint64)usertrap();
+  t->trapframe->kernel_satp  = MAKE_SATP(p->pagetable);
+  t->trapframe->kernel_hartid = r_tp();
+  t->trapframe->kernel_sp = KSTACK(p->pid, 0) + PGSIZE;
   // An empty user page table.
   p->pagetable = proc_pagetable(p);
   if(p->pagetable == 0){
@@ -226,7 +233,7 @@ proc_pagetable(struct proc *p)
 
   // CSE 536: (Task 2.1.1) - Map the MAXTHREAD trapframes right below the Trampoline as mentioned in the instructions
   for(int i = 0; i < MAXTHREADS; i++) {
-    if (mappages(pagetable, TRAPFRAME(p->thread[i].tid), PGSIZE, (uint64)p->thread[i].trapframe, PTE_R | PTE_W) < 0) {
+    if (mappages(pagetable, TRAPFRAME(p->thread[i].tid), PGSIZE, (uint64)p->thread[i].trapframe, PTE_R | PTE_W | PTE_U) < 0) {
       uvmunmap(pagetable, TRAMPOLINE, 1, 0);  
       uvmfree(pagetable, 0);
       return 0;
