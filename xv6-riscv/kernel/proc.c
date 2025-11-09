@@ -163,7 +163,7 @@ found:
   t->tid = 0; 
 
   t->trapframe->kernel_trap  = (uint64)usertrapret;
-  w_stvec((uint64)usertrapret);
+  // w_stvec((uint64)usertrapret);
   t->trapframe->kernel_satp  = MAKE_SATP(p->pagetable);
   t->trapframe->kernel_hartid = r_tp();
   t->trapframe->kernel_sp = KSTACK(p->pid, 0) + PGSIZE;
@@ -256,7 +256,7 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
   for(int i = 0; i < MAXTHREADS; i++){
     if(p->thread[i].trapframe){
       uint64 va = TRAPFRAME(i);
-      uvmunmap(pagetable, va, 1, 0); 
+      uvmunmap(pagetable, va, 1, 1); 
       p->thread[i].trapframe=0;
     }
   }
