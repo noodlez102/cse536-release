@@ -236,7 +236,7 @@ proc_pagetable(struct proc *p)
   // CSE 536: (Task 2.1.1) - Map the MAXTHREAD trapframes right below the Trampoline as mentioned in the instructions
   for(int i = 0; i < MAXTHREADS; i++) {
     if (mappages(pagetable, TRAPFRAME(p->thread[i].tid), PGSIZE, (uint64)p->thread[i].trapframe, PTE_R | PTE_W ) < 0) {
-      uvmunmap(pagetable, TRAMPOLINE, 1, 1);  
+      uvmunmap(pagetable, TRAMPOLINE, 1, 0);  
       uvmfree(pagetable, 0);
       return 0;
     }
