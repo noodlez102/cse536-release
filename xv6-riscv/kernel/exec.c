@@ -87,7 +87,7 @@ exec(char *path, char **argv)
       goto bad;
     sz += PGSIZE;
     uint64 stack = sz;
-    if(uvmalloc(pagetable, sz, sz + PGSIZE, PTE_W) == 0)
+    if(uvmalloc(pagetable, sz, sz + PGSIZE, PTE_W | PTE_R) == 0)
       goto bad;
     sz += PGSIZE;
     if(p->thread[i].trapframe)
