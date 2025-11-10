@@ -260,7 +260,6 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
       p->thread[i].trapframe=0;
     }
   }
-
   uvmfree(pagetable, sz);
 }
 
