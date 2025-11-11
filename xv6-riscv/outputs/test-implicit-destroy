@@ -1,0 +1,3 @@
+[*] Running implicit thread destroy test
+[.] started the thread function (tid = 1)
+[*] Implicit thread destroy test complete

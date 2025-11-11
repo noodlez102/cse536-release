@@ -139,6 +139,8 @@ UPROGS=\
 	$U/_test3-priority\
 	$U/_test4-usync1\
 	$U/_test5-usync2\
+	$U/_test-implicit-destroy\
+	$U/_test-argsmax\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
