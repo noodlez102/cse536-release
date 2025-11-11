@@ -151,6 +151,12 @@ found:
   for(int tid = 0; tid < MAXTHREADS; tid++) {
     p->thread[tid].tid = tid;
     p->thread[tid].state = UNUSED;
+  
+    t->trapframe->kernel_trap  = (uint64)usertrap();
+    // printf("spec is in alloproc %p\n", p->thread[0].trapframe->epc);
+    t->trapframe->kernel_satp  = MAKE_SATP(p->pagetable);
+    t->trapframe->kernel_hartid = r_tp();
+    t->trapframe->kernel_sp = KSTACK(p->pid, tid) + PGSIZE;
     // p->thread[tid].trapframe->epc = p->thread[0].trapframe->epc;
     if((p->thread[tid].trapframe =((struct trapframe*)kalloc()))== 0) {
       freeproc(p);
@@ -163,11 +169,6 @@ found:
   t->state = USED;
   t->tid = 0; 
 
-  // // t->trapframe->kernel_trap  = (uint64)usertrapret;
-  // // printf("spec is in alloproc %p\n", p->thread[0].trapframe->epc);
-  // t->trapframe->kernel_satp  = MAKE_SATP(p->pagetable);
-  // t->trapframe->kernel_hartid = r_tp();
-  // t->trapframe->kernel_sp = KSTACK(p->pid, 0) + PGSIZE;
 
   // An empty user page table.
   p->pagetable = proc_pagetable(p);
