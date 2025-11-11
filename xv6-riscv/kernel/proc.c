@@ -151,7 +151,7 @@ found:
   for(int tid = 0; tid < MAXTHREADS; tid++) {
     p->thread[tid].tid = tid;
     p->thread[tid].state = UNUSED;
-    p->thread[tid].trapframe->epc = p->thread[0].trapframe->epc;
+    // p->thread[tid].trapframe->epc = p->thread[0].trapframe->epc;
     if((p->thread[tid].trapframe =((struct trapframe*)kalloc()))== 0) {
       freeproc(p);
       release(&p->lock);
