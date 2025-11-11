@@ -158,7 +158,7 @@ found:
     t->trapframe->kernel_hartid = r_tp();
     t->trapframe->kernel_sp = KSTACK(p->pid, tid) + PGSIZE;
     // p->thread[tid].trapframe->epc = p->thread[0].trapframe->epc;
-    if((p->thread[tid].trapframe =((struct trapframe*)kalloc()))== 0) {
+    if((p->thread[tid].trapframe =(kalloc()))== 0) {
       freeproc(p);
       release(&p->lock);
       return 0;
