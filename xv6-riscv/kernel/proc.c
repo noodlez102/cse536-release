@@ -164,6 +164,7 @@ found:
 
   t->trapframe->kernel_trap  = (uint64)usertrapret;
   w_stvec((uint64)usertrapret);
+  mythread()->trapframe->epc=r_sepc();
   t->trapframe->kernel_satp  = MAKE_SATP(p->pagetable);
   t->trapframe->kernel_hartid = r_tp();
   t->trapframe->kernel_sp = KSTACK(p->pid, 0) + PGSIZE;
