@@ -134,11 +134,12 @@ exec(char *path, char **argv)
   p->pagetable = pagetable;
   p->sz = sz;
   p->thread[0].trapframe->epc = elf.entry;  // initial program counter = main
-  printf("thread 0 %p\n", p->thread[0].trapframe->epc);
   // CSE 536: (Task 2.1.1) - set the correct user stack in the in each thread's trapframe
  uint64 stacks_base = p->sz - (uint64)MAXTHREADS * 2 * PGSIZE;
 
   for (int i = 0; i < MAXTHREADS; i++) {
+    p->thread[i].trapframe->epc = elf.entry;  // initial program counter = main
+
     uint64 stack_page = stacks_base + (uint64)(i * 2 + 1) * PGSIZE;
     uint64 stack_top  = stack_page + PGSIZE;
     p->thread[i].trapframe->sp = stack_top;
