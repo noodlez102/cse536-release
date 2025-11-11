@@ -164,7 +164,7 @@ found:
   t->tid = 0; 
 
   t->trapframe->kernel_trap  = (uint64)usertrapret;
-  printf("spec is in alloproc %p\n", p->thread[0].trapframe->epc);
+  // printf("spec is in alloproc %p\n", p->thread[0].trapframe->epc);
   t->trapframe->kernel_satp  = MAKE_SATP(p->pagetable);
   t->trapframe->kernel_hartid = r_tp();
   t->trapframe->kernel_sp = KSTACK(p->pid, 0) + PGSIZE;
