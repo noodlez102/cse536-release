@@ -155,7 +155,7 @@ found:
     p->thread[tid].trapframe->kernel_satp  = MAKE_SATP(p->pagetable);
     p->thread[tid].trapframe->kernel_hartid = r_tp();
     p->thread[tid].trapframe->kernel_sp = KSTACK(p->pid, tid) + PGSIZE;
-    p->thread[tid].trapframe->kernel_trap = (uint64)usertrap;
+    // p->thread[tid].trapframe->kernel_trap = (uint64)usertrap;
     p->thread[tid].trapframe->epc = p->thread[0].trapframe->epc;
 
     if((p->thread[tid].trapframe =((struct trapframe*)kalloc()))== 0) {
