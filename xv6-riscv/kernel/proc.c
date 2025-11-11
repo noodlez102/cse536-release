@@ -152,7 +152,7 @@ found:
     p->thread[tid].tid = tid;
     p->thread[tid].state = UNUSED;
   
-    t->trapframe->kernel_trap  = (uint64)usertrap();
+    t->trapframe->kernel_trap  = (uint64)usertrapret;
     // printf("spec is in alloproc %p\n", p->thread[0].trapframe->epc);
     t->trapframe->kernel_satp  = MAKE_SATP(p->pagetable);
     t->trapframe->kernel_hartid = r_tp();
