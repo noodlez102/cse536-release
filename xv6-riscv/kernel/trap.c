@@ -49,7 +49,7 @@ usertrap(void)
   
   // save user program counter.
   mythread()->trapframe->epc = r_sepc();
-  
+  printf("the epc here is %p", mythread()->trapframe->epc);
   if(r_scause() == 8){
     // system call
 
@@ -79,7 +79,6 @@ usertrap(void)
   // give up the CPU if this is a timer interrupt.
   if(which_dev == 2)
     yield();
-  printf("in usertrap\n");
   usertrapret();
 }
 
