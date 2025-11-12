@@ -163,10 +163,6 @@ found:
     }
     memset(p->thread[tid].trapframe, 0, PGSIZE);
   }
-  t = &p->thread[0];
-  t->state = USED;
-  t->tid = 0; 
-
 
   // An empty user page table.
   p->pagetable = proc_pagetable(p);
