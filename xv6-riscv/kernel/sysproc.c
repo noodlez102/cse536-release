@@ -140,7 +140,7 @@ sys_thread_create(void)
   
   t->trapframe->kernel_satp = r_satp();
   t->trapframe->kernel_sp = KSTACK(p->pid, tid) + PGSIZE;
-  t->trapframe->kernel_trap = (uint64)usertrap;
+  t->trapframe->kernel_trap = (uint64)usertrapret;
   t->trapframe->kernel_hartid = r_tp();
   
   t->priority = 0;
