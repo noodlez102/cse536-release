@@ -105,6 +105,7 @@ exec(char *path, char **argv)
     sz = sz1;
     uvmclear(pagetable, sz-2*PGSIZE);
   }
+  
   sp = sz;
   stackbase = sp - PGSIZE;
 
