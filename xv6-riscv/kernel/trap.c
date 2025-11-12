@@ -102,6 +102,7 @@ usertrapret(void)
 
   // set up trapframe values that uservec will need when
   // the process next traps into the kernel.
+  printf("my thread id %d\n", mythread()->tid);
   mythread()->trapframe->kernel_satp = r_satp();         // kernel page table
   mythread()->trapframe->kernel_sp = KSTACK(p->pid, mythread()->tid) + PGSIZE;
   mythread()->trapframe->kernel_trap = (uint64)usertrap;
