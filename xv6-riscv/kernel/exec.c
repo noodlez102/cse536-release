@@ -146,19 +146,15 @@ exec(char *path, char **argv)
   p->sz = sz;
   p->thread[0].trapframe->epc = elf.entry;  // initial program counter = main
   // CSE 536: (Task 2.1.1) - set the correct user stack in the in each thread's trapframe
-  // uint64 stacks_base = p->sz - (uint64)MAXTHREADS * 2 * PGSIZE;
-  // for (int i = 0; i < MAXTHREADS; i++) {
-  //   uint64 stack_page = stacks_base + (uint64)(i * 2 + 1) * PGSIZE;
-  //   uint64 stack_top  = stack_page + PGSIZE;
-  //   p->thread[i].trapframe->epc = elf.entry;
-  //   p->thread[i].trapframe->sp = stack_top;
-  //   p->thread[i].tid = i;
-  // }
-  p->thread[0].trapframe->sp = sp;  // initial program counter = main
-
-  for(int i =0; i<MAXTHREADS;i++){
-
+  uint64 stacks_base = p->sz - (uint64)MAXTHREADS * 2 * PGSIZE;
+  for (int i = 0; i < MAXTHREADS; i++) {
+    uint64 stack_page = stacks_base + (uint64)(i * 2 + 1) * PGSIZE;
+    uint64 stack_top  = stack_page + PGSIZE;
+    p->thread[i].trapframe->epc = elf.entry;
+    p->thread[i].trapframe->sp = stack_top;
+    p->thread[i].tid = i;
   }
+
   proc_freepagetable(oldpagetable, oldsz);
 
   return argc; // this ends up in a0, the first argument to main(argc, argv)
