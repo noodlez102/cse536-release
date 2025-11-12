@@ -129,7 +129,7 @@ usertrapret(void)
   
   // CSE 536: (Task 2.1.2) - Pass the address of the current thread's TRAPFRAME in s11
   mythread()->trapframe->s11 = TRAPFRAME(mythread()->tid);
-  printf("sepc is %p, sstatus is %d, satp is %p, and sp is %p, and kernel_sp is %p\n", r_sepc(), r_sstatus(), r_satp(), r_sp(), KSTACK(p->pid, mythread()->tid) + PGSIZE);
+  // printf("sepc is %p, sstatus is %d, satp is %p, and sp is %p, and kernel_sp is %p\n", r_sepc(), r_sstatus(), r_satp(), r_sp(), KSTACK(p->pid, mythread()->tid) + PGSIZE);
   // printf("mythread()->tid = %d, thread[0].trapframe->epc = %p, trapframe->s11 = %p\n", mythread()->tid, p->thread[0].trapframe->epc, TRAPFRAME(mythread()->tid));
   asm volatile("mv s11, %0" :: "r"(TRAPFRAME(mythread()->tid)) : "s11");
   ((void (*)(uint64))trampoline_userret)(satp);
