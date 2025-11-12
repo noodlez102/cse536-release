@@ -49,7 +49,7 @@ usertrap(void)
   
   // save user program counter.
   mythread()->trapframe->epc = r_sepc();
-  printf("the epc here is %p", mythread()->trapframe->epc);
+  
   if(r_scause() == 8){
     // system call
 
@@ -59,7 +59,6 @@ usertrap(void)
     // sepc points to the ecall instruction,
     // but we want to return to the next instruction.
     mythread()->trapframe->epc += 4;
-    printf("does this even get here?\n");
     // an interrupt will change sepc, scause, and sstatus,
     // so enable only now that we're done with those registers.
     intr_on();
