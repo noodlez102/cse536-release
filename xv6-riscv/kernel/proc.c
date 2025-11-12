@@ -163,7 +163,7 @@ found:
       return 0;
     }
     p->thread[0].trapframe->epc= r_sepc();
-    printf("epc for thread 0 shouild be %p", p->thread[0].trapframe->epc);
+    printf("epc for thread 0 shouild be %p\n", p->thread[0].trapframe->epc);
     // memset(p->thread[tid].trapframe, 0, PGSIZE);
   }
   // printf("exiting allocproc\n");
