@@ -95,64 +95,7 @@ uint64
 sys_thread_create(void)
 {
   // CSE 536: (Task 2.2.1) - Handle argument passing for thread_create()
-  uint64 start_func;
-  uint64 arg;
-  
-  argaddr(0, &start_func); 
-  argaddr(1, &arg);        
-  
-  struct proc *p = myproc();
-  struct thread *t = 0;
-  int tid = -1;
-  
-  acquire(&p->lock);
-  
-  for(int i = 0; i < MAXTHREADS; i++) {
-    if(p->thread[i].state == UNUSED) {
-      t = &p->thread[i];
-      tid = i;
-      t->state = USED;
-      break;
-    }
-  }
-  
-  if(tid == -1) {
-    release(&p->lock);
-    return -1;
-  }
-  
-
-  memmove(t->trapframe, mythread()->trapframe, sizeof(struct trapframe));
-  
-  t->trapframe->epc = start_func; 
-  t->trapframe->a0 = arg;        
-  
-
-  uint64 stacks_base = p->sz - (uint64)MAXTHREADS * 2 * PGSIZE;
-  uint64 stack_page = stacks_base + (uint64)(tid * 2 + 1) * PGSIZE;
-  t->trapframe->sp = stack_page + PGSIZE;  
-  
-  memset(&t->context, 0, sizeof(t->context));
-  t->context.ra = (uint64)forkret;  
-  t->context.sp = KSTACK(p->pid, tid) + PGSIZE; 
-  
-  t->trapframe->s11 = TRAPFRAME(tid);
-  
-  t->trapframe->kernel_satp = r_satp();
-  t->trapframe->kernel_sp = KSTACK(p->pid, tid) + PGSIZE;
-  t->trapframe->kernel_trap = (uint64)usertrapret;
-  t->trapframe->kernel_hartid = r_tp();
-  
-  t->priority = 0;
-  t->chan = 0;
-  
-  t->state = RUNNABLE;
-  
-  p->active_threads++;
-  
-  release(&p->lock);
-  
-  return tid;  // Return the thread ID
+  return 0;
 }
 
 uint64
