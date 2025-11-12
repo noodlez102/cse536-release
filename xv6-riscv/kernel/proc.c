@@ -153,9 +153,9 @@ found:
     p->thread[tid].state = UNUSED;
     p->thread[tid].priority = 0;
     p->thread[tid].chan = 0;
-    initlock(&p->thread[tid].lock, "thread");
+    // initlock(&p->thread[tid].lock, "thread");
     memset(&p->thread[tid].context, 0, sizeof(p->thread[tid].context));
-    
+
     if((p->thread[tid].trapframe =((struct trapframe*)kalloc()))== 0) {
       freeproc(p);
       release(&p->lock);
