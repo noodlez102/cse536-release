@@ -178,6 +178,7 @@ found:
 
   // Set up new context to start executing at forkret,
   // which returns to user space.
+  printf("size of t is %d, and address is %p\n",sizeof(t->context),&(t->context));
   memset(&(t->context), 0, sizeof(t->context));
   t->context.ra = (uint64)forkret;
   t->context.sp = KSTACK(p->pid,t->tid) + PGSIZE;
