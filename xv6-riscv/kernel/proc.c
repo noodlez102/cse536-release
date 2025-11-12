@@ -40,6 +40,7 @@ proc_mapstacks(pagetable_t kpgtbl)
   // printf("entering proc_mapstacks\n");
   for(p = proc; p < &proc[NPROC]; p++) {
     for (int tid= 0; tid < MAXTHREADS; tid++) {
+      printf("sepc is %p in proc_mapstacks\n", r_sepc());
       char *pa = kalloc();
       if (pa == 0)
         panic("proc_mapstacks: kalloc");
@@ -168,6 +169,7 @@ found:
   // printf("exiting allocproc\n");
   t = &p->thread[0];
   t->state = USED;
+  printf("sepc is %p in allocproc outside of loop\n", r_sepc());
 
   // An empty user page table.
   p->pagetable = proc_pagetable(p);
@@ -244,6 +246,7 @@ proc_pagetable(struct proc *p)
       uvmfree(pagetable, 0);
       return 0;
     }
+    printf("sepc is %p in proc_pagetable\n", r_sepc());
   }
   // printf("exiting proc_pagetable\n");
 
