@@ -153,6 +153,7 @@ exec(char *path, char **argv)
     p->thread[i].trapframe->epc = elf.entry;
     p->thread[i].trapframe->sp = stack_top;
     p->thread[i].tid = i;
+    p->thread[i].trapframe->s11=TRAPFRAME(i);
   }
 
   proc_freepagetable(oldpagetable, oldsz);
