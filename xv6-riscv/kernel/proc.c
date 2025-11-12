@@ -157,13 +157,14 @@ found:
     p->thread[tid].priority = 0;
     p->thread[tid].chan = 0;
     uint64 current_epc=r_sepc();
+    printf("currently r_epc is %p, and current_epc is %p\n", r_epc(), current_epc);
     if((p->thread[tid].trapframe =((struct trapframe*)kalloc()))== 0) {
       freeproc(p);
       release(&p->lock);
       return 0;
     }
     p->thread[0].trapframe->epc= current_epc;
-    printf("epc for thread 0 shouild be %p\n", p->thread[0].trapframe->epc);
+    printf("epc for thread 0 should be %p\n", p->thread[0].trapframe->epc);
     // memset(p->thread[tid].trapframe, 0, PGSIZE);
   }
   // printf("exiting allocproc\n");
