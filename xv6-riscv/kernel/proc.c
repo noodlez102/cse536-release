@@ -164,10 +164,11 @@ found:
       release(&p->lock);
       return 0;
     }
-    // memset(p->thread[tid].trapframe, 0, PGSIZE);
+    memset(p->thread[tid].trapframe, 0, PGSIZE);
   }
   printf("exiting allocproc\n");
-
+  t = &p->thread[0];
+  t->state = USED;
 
   // An empty user page table.
   p->pagetable = proc_pagetable(p);
