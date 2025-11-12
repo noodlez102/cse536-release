@@ -153,7 +153,7 @@ found:
   printf("entering allocproc\n");
   for(int tid = 0; tid < MAXTHREADS; tid++) {
     p->thread[tid].tid = tid;
-    p->thread[tid].state = UNUSED;
+    p->thread[tid].state = USED;
     p->thread[tid].priority = 0;
     p->thread[tid].chan = 0;
     
