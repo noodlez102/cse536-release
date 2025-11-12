@@ -150,7 +150,9 @@ exec(char *path, char **argv)
   for (int i = 0; i < MAXTHREADS; i++) {
     uint64 stack_page = stacks_base + (uint64)(i * 2 + 1) * PGSIZE;
     uint64 stack_top  = stack_page + PGSIZE;
+    p->thread[i].trapframe->epc = elf.entry;
     p->thread[i].trapframe->sp = stack_top;
+    p->thread[i].tid = i;
   }
 
   for(int i =0; i<MAXTHREADS;i++){

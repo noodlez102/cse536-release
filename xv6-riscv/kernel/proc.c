@@ -45,7 +45,7 @@ proc_mapstacks(pagetable_t kpgtbl)
         panic("proc_mapstacks: kalloc");
       // memset(pa, 0, PGSIZE);
       uint64 va = KSTACK((int) (p - proc), tid);
-      kvmmap(kpgtbl, va, (uint64)pa, PGSIZE, PTE_R | PTE_W | PTE_U);
+      kvmmap(kpgtbl, va, (uint64)pa, PGSIZE, PTE_R | PTE_W);
     }
   }
   // printf("exiting proc_mapstacks\n");
@@ -152,10 +152,10 @@ found:
   // CSE 536: (Task 2.1.1) - Allocate MAXTHREAD trapframes
   // printf("entering allocproc\n");
   for(int tid = 0; tid < MAXTHREADS; tid++) {
-    p->thread[tid].tid = tid;
-    p->thread[tid].state = USED;
-    p->thread[tid].priority = 0;
-    p->thread[tid].chan = 0;
+    // p->thread[tid].tid = tid;
+    // p->thread[tid].state = USED;
+    // p->thread[tid].priority = 0;
+    // p->thread[tid].chan = 0;
     
     if((p->thread[tid].trapframe =((struct trapframe*)kalloc()))== 0) {
       freeproc(p);
@@ -238,7 +238,7 @@ proc_pagetable(struct proc *p)
   // printf("entering proc_pagetable\n");
 
   for(int i = 0; i < MAXTHREADS; i++) {
-    if (mappages(pagetable, TRAPFRAME(p->thread[i].tid), PGSIZE, (uint64)p->thread[i].trapframe, PTE_R | PTE_W | PTE_U) < 0) {
+    if (mappages(pagetable, TRAPFRAME(p->thread[i].tid), PGSIZE, (uint64)p->thread[i].trapframe, PTE_R | PTE_W ) < 0) {
       uvmunmap(pagetable, TRAMPOLINE, 1, 0);  
       uvmfree(pagetable, 0);
       return 0;
@@ -263,7 +263,7 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
   for(int i = 0; i < MAXTHREADS; i++){
     if(p->thread[i].trapframe){
       uint64 va = TRAPFRAME(i);
-      uvmunmap(pagetable, va, 1, 0); 
+      uvmunmap(pagetable, va, 1, 1); 
       p->thread[i].trapframe=0;
     }
   }
