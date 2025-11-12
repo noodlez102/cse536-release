@@ -150,7 +150,7 @@ found:
   t->state = USED;
 
   // CSE 536: (Task 2.1.1) - Allocate MAXTHREAD trapframes
-  printf("entering allocproc\n");
+  // printf("entering allocproc\n");
   // for(int tid = 0; tid < MAXTHREADS; tid++) {
     // p->thread[tid].tid = tid;
     // p->thread[tid].state = USED;
