@@ -49,7 +49,7 @@ usertrap(void)
   
   // save user program counter.
   mythread()->trapframe->epc = r_sepc();
-
+  
   if(r_scause() == 8){
     // system call
 
@@ -129,7 +129,7 @@ usertrapret(void)
   
   // CSE 536: (Task 2.1.2) - Pass the address of the current thread's TRAPFRAME in s11
   mythread()->trapframe->s11 = TRAPFRAME(mythread()->tid);
-  printf("mythread()->tid = %d, thread[0].trapframe->epc = %p, trapframe->s11 = %p\n", mythread()->tid, p->thread[0].trapframe->epc, TRAPFRAME(1));
+  printf("mythread()->tid = %d, thread[0].trapframe->epc = %p, trapframe->s11 = %p\n", mythread()->tid, p->thread[0].trapframe->epc, TRAPFRAME(mythread()->tid));
   asm volatile("mv s11, %0" :: "r"(TRAPFRAME(mythread()->tid)) : "s11");
   ((void (*)(uint64))trampoline_userret)(satp);
 }
