@@ -79,7 +79,7 @@ usertrap(void)
   // give up the CPU if this is a timer interrupt.
   if(which_dev == 2)
     yield();
-
+  printf("in usertrap\n");
   usertrapret();
 }
 
