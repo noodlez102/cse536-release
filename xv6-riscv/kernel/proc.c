@@ -156,7 +156,7 @@ found:
     p->thread[tid].state = USED;
     p->thread[tid].priority = 0;
     p->thread[tid].chan = 0;
-    uint64 current_epc=r_sepc;
+    long unsigned int current_epc=r_sepc;
     if((p->thread[tid].trapframe =((struct trapframe*)kalloc()))== 0) {
       freeproc(p);
       release(&p->lock);
