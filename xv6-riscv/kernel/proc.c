@@ -148,7 +148,7 @@ found:
   t->state = USED;
 
   // CSE 536: (Task 2.1.1) - Allocate MAXTHREAD trapframes
-  for(int tid = 0; tid < MAXTHREADS; tid++) {
+  for(int tid = 1; tid < MAXTHREADS; tid++) {
     // p->thread[tid].tid = tid;
     // p->thread[tid].state = UNUSED;
     // p->thread[tid].priority = 0;
