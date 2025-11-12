@@ -37,7 +37,7 @@ proc_mapstacks(pagetable_t kpgtbl)
 {
   // CSE 536: (Task 2.1.1) - Allocate and map MAXTHREADS kernel stacks for each process according to the instructions
   struct proc *p;
-
+  printf("entering proc_mapstacks\n");
   for(p = proc; p < &proc[NPROC]; p++) {
     for (int tid= 0; tid < MAXTHREADS; tid++) {
       char *pa = kalloc();
@@ -48,6 +48,8 @@ proc_mapstacks(pagetable_t kpgtbl)
       kvmmap(kpgtbl, va, (uint64)pa, PGSIZE, PTE_R | PTE_W | PTE_U);
     }
   }
+  printf("exiting proc_mapstacks\n");
+
 }
 
 // initialize the proc table.
@@ -148,6 +150,7 @@ found:
   t->state = USED;
 
   // CSE 536: (Task 2.1.1) - Allocate MAXTHREAD trapframes
+  printf("entering allocproc\n");
   for(int tid = 0; tid < MAXTHREADS; tid++) {
     // p->thread[tid].tid = tid;
     // p->thread[tid].state = UNUSED;
@@ -163,6 +166,8 @@ found:
     }
     // memset(p->thread[tid].trapframe, 0, PGSIZE);
   }
+  printf("exiting allocproc\n");
+
 
   // An empty user page table.
   p->pagetable = proc_pagetable(p);
@@ -230,6 +235,8 @@ proc_pagetable(struct proc *p)
   }
 
   // CSE 536: (Task 2.1.1) - Map the MAXTHREAD trapframes right below the Trampoline as mentioned in the instructions
+  printf("entering proc_pagetable\n");
+
   for(int i = 0; i < MAXTHREADS; i++) {
     if (mappages(pagetable, TRAPFRAME(p->thread[i].tid), PGSIZE, (uint64)p->thread[i].trapframe, PTE_R | PTE_W | PTE_U) < 0) {
       uvmunmap(pagetable, TRAMPOLINE, 1, 0);  
@@ -237,6 +244,8 @@ proc_pagetable(struct proc *p)
       return 0;
     }
   }
+  printf("exiting proc_pagetable\n");
+
   return pagetable;
 }
 
@@ -248,6 +257,8 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
   uvmunmap(pagetable, TRAMPOLINE, 1, 0);
 
   // CSE 536: (Task 2.1.1) - unmap and free all the trapframes
+  printf("entering proc_freepagetable\n");
+
   struct proc *p = myproc();
   for(int i = 0; i < MAXTHREADS; i++){
     if(p->thread[i].trapframe){
@@ -256,6 +267,8 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
       p->thread[i].trapframe=0;
     }
   }
+  printf("exiting proc_freepagetable\n");
+
   uvmfree(pagetable, sz);
 }
 
