@@ -158,11 +158,12 @@ found:
     p->thread[tid].chan = 0;
     printf("this is what sepc is here %p\n", r_sepc);
     if((p->thread[tid].trapframe->epc= r_sepc())== 0) {
+      printf("hit the pthread epc if");
       freeproc(p);
       release(&p->lock);
       return 0;
     }
-    p->thread[tid].trapframe->epc= r_sepc();
+    // p->thread[tid].trapframe->epc= r_sepc();
     if((p->thread[tid].trapframe =((struct trapframe*)kalloc()))== 0) {
       freeproc(p);
       release(&p->lock);
