@@ -149,10 +149,10 @@ found:
 
   // CSE 536: (Task 2.1.1) - Allocate MAXTHREAD trapframes
   for(int tid = 0; tid < MAXTHREADS; tid++) {
-    p->thread[tid].tid = tid;
-    p->thread[tid].state = UNUSED;
-    p->thread[tid].priority = 0;
-    p->thread[tid].chan = 0;
+    // p->thread[tid].tid = tid;
+    // p->thread[tid].state = UNUSED;
+    // p->thread[tid].priority = 0;
+    // p->thread[tid].chan = 0;
     // initlock(&p->thread[tid].lock, "thread");
     // memset(&p->thread[tid].context, 0, sizeof(p->thread[tid].context));
 
@@ -161,7 +161,7 @@ found:
       release(&p->lock);
       return 0;
     }
-    memset(p->thread[tid].trapframe, 0, PGSIZE);
+    // memset(p->thread[tid].trapframe, 0, PGSIZE);
   }
 
   // An empty user page table.
