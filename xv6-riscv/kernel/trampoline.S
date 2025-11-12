@@ -149,11 +149,6 @@ userret:
 	# restore user a0
         ld a0, 112(a0)
         
-        # Right before sret executes:
-        print/x $sepc      # Should be 0x0 (where initcode is)
-        print/x $sstatus   # Check SPP bit (should be 0 for user mode)
-        print/x $satp      # User page table
-        print/x $sp        # User stack pointer (should be 0x1000)
         # return to user mode and user pc.
         # usertrapret() set up sstatus and sepc.
         sret
