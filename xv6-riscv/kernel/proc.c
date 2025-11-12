@@ -161,7 +161,7 @@ found:
       freeproc(p);
       release(&p->lock);
       return 0;
-    // }
+    }
     // memset(p->thread[tid].trapframe, 0, PGSIZE);
   // }
   // printf("exiting allocproc\n");
