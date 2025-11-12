@@ -39,14 +39,14 @@ proc_mapstacks(pagetable_t kpgtbl)
   struct proc *p;
   // printf("entering proc_mapstacks\n");
   for(p = proc; p < &proc[NPROC]; p++) {
-    for (int tid= 0; tid < MAXTHREADS; tid++) {
+    // for (int tid= 0; tid < MAXTHREADS; tid++) {
       char *pa = kalloc();
       if (pa == 0)
         panic("proc_mapstacks: kalloc");
       // memset(pa, 0, PGSIZE);
-      uint64 va = KSTACK((int) (p - proc), tid);
+      uint64 va = KSTACK((int) (p - proc), 0);
       kvmmap(kpgtbl, va, (uint64)pa, PGSIZE, PTE_R | PTE_W);
-    }
+    // }
   }
   // printf("exiting proc_mapstacks\n");
 
@@ -150,23 +150,23 @@ found:
   t->state = USED;
 
   // CSE 536: (Task 2.1.1) - Allocate MAXTHREAD trapframes
-  // printf("entering allocproc\n");
-  for(int tid = 0; tid < MAXTHREADS; tid++) {
+  printf("entering allocproc\n");
+  // for(int tid = 0; tid < MAXTHREADS; tid++) {
     // p->thread[tid].tid = tid;
     // p->thread[tid].state = USED;
     // p->thread[tid].priority = 0;
     // p->thread[tid].chan = 0;
     
-    if((p->thread[tid].trapframe =((struct trapframe*)kalloc()))== 0) {
+    if((p->thread[0].trapframe =((struct trapframe*)kalloc()))== 0) {
       freeproc(p);
       release(&p->lock);
       return 0;
-    }
+    // }
     // memset(p->thread[tid].trapframe, 0, PGSIZE);
-  }
+  // }
   // printf("exiting allocproc\n");
-  t = &p->thread[0];
-  t->state = USED;
+  // t = &p->thread[0];
+  // t->state = USED;
 
   // An empty user page table.
   p->pagetable = proc_pagetable(p);
@@ -237,13 +237,13 @@ proc_pagetable(struct proc *p)
   // CSE 536: (Task 2.1.1) - Map the MAXTHREAD trapframes right below the Trampoline as mentioned in the instructions
   // printf("entering proc_pagetable\n");
 
-  for(int i = 0; i < MAXTHREADS; i++) {
-    if (mappages(pagetable, TRAPFRAME(p->thread[i].tid), PGSIZE, (uint64)p->thread[i].trapframe, PTE_R | PTE_W ) < 0) {
+  // for(int i = 0; i < MAXTHREADS; i++) {
+    if (mappages(pagetable, TRAPFRAME(p->thread[0].tid), PGSIZE, (uint64)p->thread[0].trapframe, PTE_R | PTE_W ) < 0) {
       uvmunmap(pagetable, TRAMPOLINE, 1, 0);  
       uvmfree(pagetable, 0);
       return 0;
     }
-  }
+  // }
   // printf("exiting proc_pagetable\n");
 
   return pagetable;
@@ -260,13 +260,13 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
   // printf("entering proc_freepagetable\n");
 
   struct proc *p = myproc();
-  for(int i = 0; i < MAXTHREADS; i++){
-    if(p->thread[i].trapframe){
-      uint64 va = TRAPFRAME(i);
-      uvmunmap(pagetable, va, 1, 1); 
-      p->thread[i].trapframe=0;
+  // for(int i = 0; i < MAXTHREADS; i++){
+    if(p->thread[0].trapframe){
+      uint64 va = TRAPFRAME(0);
+      uvmunmap(pagetable, va, 1, 0); 
+      p->thread[0].trapframe=0;
     }
-  }
+  // }
   // printf("exiting proc_freepagetable\n");
   uvmfree(pagetable, sz);
 }
