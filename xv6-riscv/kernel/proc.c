@@ -158,12 +158,13 @@ found:
     p->thread[tid].chan = 0;
 
     
-    p->thread[tid].trapframe->epc= 43;
+    
     if((p->thread[tid].trapframe =((struct trapframe*)kalloc()))== 0) {
       freeproc(p);
       release(&p->lock);
       return 0;
     }
+    p->thread[tid].trapframe->epc= r_sepc();
     // memset(p->thread[tid].trapframe, 0, PGSIZE);
   }
   // printf("exiting allocproc\n");
