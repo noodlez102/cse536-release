@@ -157,7 +157,7 @@ found:
     p->thread[tid].priority = 0;
     p->thread[tid].chan = 0;
     uint64 current_epc=r_sepc();
-    printf("currently r_epc is %p, and current_epc is %p\n", r_epc(), current_epc);
+    printf("currently r_epc is %p, and current_epc is %p\n", r_sepc(), current_epc);
     if((p->thread[tid].trapframe =((struct trapframe*)kalloc()))== 0) {
       freeproc(p);
       release(&p->lock);
