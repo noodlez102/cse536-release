@@ -83,26 +83,26 @@ exec(char *path, char **argv)
   // uint64 sz1;
 
   // CSE 536: (Task 2.1.1) - Allocate and map MAXTHREADS user stacks + guard pages according to the instructions
-  // for(int i = 0; i < MAXTHREADS; i++){
-  //   uint64 sz1;
-  //   if((sz1 = uvmalloc(pagetable, sz, sz + PGSIZE, 0)) == 0)
-  //     goto bad;
-  //   sz = sz1;
-  //   uvmclear(pagetable, sz - PGSIZE);
-  //   if((sz1 = uvmalloc(pagetable, sz, sz + PGSIZE, PTE_W | PTE_R | PTE_U)) == 0)
-  //     goto bad;
-  //   sz = sz1;
-  // }
+  for(int i = 0; i < MAXTHREADS; i++){
+    uint64 sz1;
+    if((sz1 = uvmalloc(pagetable, sz, sz + PGSIZE, 0)) == 0)
+      goto bad;
+    sz = sz1;
+    uvmclear(pagetable, sz - PGSIZE);
+    if((sz1 = uvmalloc(pagetable, sz, sz + PGSIZE, PTE_W | PTE_R | PTE_U)) == 0)
+      goto bad;
+    sz = sz1;
+  }
 
   //writing bar for bar of old xv6 code
 
-  for (int i=0; i< MAXTHREADS;i++){
-    uint64 sz1;
-    if((sz1 = uvmalloc(pagetable, sz, sz + 2*PGSIZE, PTE_W )) == 0)
-      goto bad;
-    sz = sz1;
-    uvmclear(pagetable, sz-2*PGSIZE);
-  }
+  // for (int i=0; i< MAXTHREADS;i++){
+  //   uint64 sz1;
+  //   if((sz1 = uvmalloc(pagetable, sz, sz + 2*PGSIZE, PTE_W )) == 0)
+  //     goto bad;
+  //   sz = sz1;
+  //   uvmclear(pagetable, sz-2*PGSIZE);
+  // }
 
   sp = sz;
   stackbase = sp - PGSIZE;
@@ -145,12 +145,13 @@ exec(char *path, char **argv)
   p->pagetable = pagetable;
   p->sz = sz;
   p->thread[0].trapframe->epc = elf.entry;  // initial program counter = main
+
   // CSE 536: (Task 2.1.1) - set the correct user stack in the in each thread's trapframe
   // uint64 stacks_base = p->sz - (uint64)MAXTHREADS * 2 * PGSIZE;
   for (int i = 0; i < MAXTHREADS; i++) {
     // uint64 stack_page = stacks_base + (uint64)(i * 2 + 1) * PGSIZE;
     // uint64 stack_top  = stack_page + PGSIZE;
-    uint64 stack_top_2 = p->sz - (i * 2 * PGSIZE);
+    uint64 stack_top_2 = p->sz - (i * 2 * PGSIZE) + PGSIZE;
     // printf("%p the stack top is , and the stack top 2 is %p\n", stack_top, stack_top_2);
     p->thread[i].trapframe->sp = stack_top_2;
     // p->thread[i].trapframe->epc = elf.entry;
