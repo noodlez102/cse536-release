@@ -154,7 +154,7 @@ exec(char *path, char **argv)
     // printf("%p the stack top is , and the stack top 2 is %p\n", stack_top, stack_top_2);
     p->thread[i].trapframe->sp = stack_top_2;
     p->thread[i].trapframe->epc = elf.entry;
-    printf("this is what the sepc value is in %d %p\n",i,p->thread[i].trapframe->epc);
+    // printf("this is what the sepc value is in %d %p\n",i,p->thread[i].trapframe->epc);
     p->thread[i].trapframe->s11 = TRAPFRAME(i);
   }
 
