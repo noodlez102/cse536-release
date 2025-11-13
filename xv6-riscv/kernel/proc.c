@@ -44,7 +44,7 @@ proc_mapstacks(pagetable_t kpgtbl)
       if (pa == 0)
         panic("proc_mapstacks: kalloc");
       memset(pa, 0, PGSIZE);
-      uint64 va = KSTACK((int) (p - proc), tid);
+      uint64 va = KSTACK((int) (p - proc), tid) + PGSIZE;
       kvmmap(kpgtbl, va, (uint64)pa, PGSIZE, PTE_R | PTE_W);
     }
   }
