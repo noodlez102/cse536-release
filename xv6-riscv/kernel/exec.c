@@ -52,11 +52,9 @@ exec(char *path, char **argv)
     old_trapframes[i] = p->thread[i].trapframe;
   }
 
-  // Allocate NEW trapframe physical pages
   for(int i = 0; i < MAXTHREADS; i++) {
     p->thread[i].trapframe = (struct trapframe*)kalloc();
     if(p->thread[i].trapframe == 0) {
-      // Cleanup on failure
       for(int j = 0; j < i; j++) {
         kfree((void*)p->thread[j].trapframe);
         p->thread[j].trapframe = old_trapframes[j];
@@ -180,7 +178,7 @@ exec(char *path, char **argv)
     p->thread[i].trapframe->sp = stack_top;
     // p->thread[i].trapframe->epc = elf.entry;
     // printf("this is what the sepc value is in %d %p\n",i,p->thread[i].trapframe->epc);
-    p->thread[i].trapframe->s11 = KSTACK(p->pid, i);
+    p->thread[i].trapframe->s11 = TRAPFRAME(i);
   }
 
   proc_freepagetable(oldpagetable, oldsz);
