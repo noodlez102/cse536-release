@@ -100,7 +100,7 @@ exec(char *path, char **argv)
 
   for (int i=0; i< MAXTHREADS;i++){
     uint64 sz1;
-    if((sz1 = uvmalloc(pagetable, sz, sz + 2*PGSIZE, PTE_W)) == 0)
+    if((sz1 = uvmalloc(pagetable, sz, sz + 2*PGSIZE, PTE_W | PTE_R)) == 0)
       goto bad;
     sz = sz1;
     uvmclear(pagetable, sz-2*PGSIZE);
@@ -147,7 +147,7 @@ exec(char *path, char **argv)
   p->pagetable = pagetable;
   p->sz = sz;
   p->thread[0].trapframe->epc = elf.entry;  // initial program counter = main
-  
+
   // CSE 536: (Task 2.1.1) - set the correct user stack in the in each thread's trapframe
   uint64 stacks_base = p->sz - (uint64)MAXTHREADS * 2 * PGSIZE;
   for (int i = 0; i < MAXTHREADS; i++) {
