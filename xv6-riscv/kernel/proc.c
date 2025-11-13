@@ -153,7 +153,7 @@ found:
   // printf("entering allocproc\n");
   for(int tid = 0; tid < MAXTHREADS; tid++) {
     p->thread[tid].tid = tid;
-    p->thread[tid].state = UNUSED;
+    p->thread[tid].state = USED;
     p->thread[tid].priority = 0;
     p->thread[tid].chan = 0;
     
@@ -255,16 +255,17 @@ proc_pagetable(struct proc *p)
 void
 proc_freepagetable(pagetable_t pagetable, uint64 sz)
 {
-  // uvmunmap(pagetable, TRAMPOLINE, 1, 0);
+  uvmunmap(pagetable, TRAMPOLINE, 1, 0);
 
-  // // CSE 536: (Task 2.1.1) - unmap and free all the trapframes
-  // // printf("entering proc_freepagetable\n");
-
-  // for(int i = 0; i < MAXTHREADS; i++){
-  //   uvmunmap(pagetable, TRAPFRAME(i), 1, 1);     
-  // }
-  // // printf("exiting proc_freepagetable\n");
-  // uvmfree(pagetable, sz); 
+  // CSE 536: (Task 2.1.1) - unmap and free all the trapframes
+  // printf("entering proc_freepagetable\n");
+  // struct proc *p = myproc();
+  for(int i = 0; i < MAXTHREADS; i++){
+    uvmunmap(pagetable, TRAPFRAME(i), 1, 1); 
+    // p->thread[i].trapframe=0;
+  }
+  // printf("exiting proc_freepagetable\n");
+  uvmfree(pagetable, sz); 
 }
 
 // a user program that calls exec("/init")
