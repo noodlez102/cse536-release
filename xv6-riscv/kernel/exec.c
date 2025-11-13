@@ -147,13 +147,13 @@ exec(char *path, char **argv)
   p->thread[0].trapframe->epc = elf.entry;  // initial program counter = main
 
   // CSE 536: (Task 2.1.1) - set the correct user stack in the in each thread's trapframe
-  // uint64 stacks_base = p->sz - (uint64)MAXTHREADS * 2 * PGSIZE;
+  uint64 stacks_base = p->sz - (uint64)MAXTHREADS * 2 * PGSIZE;
   for (int i = 0; i < MAXTHREADS; i++) {
-    // uint64 stack_page = stacks_base + (uint64)(i * 2 + 1) * PGSIZE;
-    // uint64 stack_top  = stack_page + PGSIZE;
-    uint64 stack_top_2 = p->sz - (i * 2 * PGSIZE+1);
+    uint64 stack_page = stacks_base + (uint64)(i * 2 + 1) * PGSIZE;
+    uint64 stack_top  = stack_page + PGSIZE;
+    // uint64 stack_top_2 = p->sz - (i * 2 * PGSIZE+1);
     // printf("%p the stack top is , and the stack top 2 is %p\n", stack_top, stack_top_2);
-    p->thread[i].trapframe->sp = stack_top_2;
+    p->thread[i].trapframe->sp = stack_top;
     p->thread[i].trapframe->epc = elf.entry;
     // printf("this is what the sepc value is in %d %p\n",i,p->thread[i].trapframe->epc);
     p->thread[i].trapframe->s11 = TRAPFRAME(i);

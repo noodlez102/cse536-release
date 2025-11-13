@@ -266,7 +266,7 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
   // printf("entering proc_freepagetable\n");
   // struct proc *p = myproc();
   for(int i = 0; i < MAXTHREADS; i++){
-    uvmunmap(pagetable, TRAPFRAME(i), 1, 0); 
+    uvmunmap(pagetable, TRAPFRAME(i), 1, 1); 
     p->thread[i].trapframe = 0;    
     p->thread[i].state = UNUSED;   
   }
