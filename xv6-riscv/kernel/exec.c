@@ -141,7 +141,7 @@ exec(char *path, char **argv)
   safestrcpy(p->name, last, sizeof(p->name));
     
   // Commit to the user image.
-  // oldpagetable = p->pagetable;
+  oldpagetable = p->pagetable;
   p->pagetable = pagetable;
   p->sz = sz;
   p->thread[0].trapframe->epc = elf.entry;  // initial program counter = main
