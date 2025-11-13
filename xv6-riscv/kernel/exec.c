@@ -31,7 +31,7 @@ exec(char *path, char **argv)
   struct proghdr ph;
   pagetable_t pagetable = 0, oldpagetable;
   struct proc *p = myproc();
-  struct trapframe *old_trapframes[MAXTHREADS];
+  // struct trapframe *old_trapframes[MAXTHREADS];
   begin_op();
 
   if((ip = namei(path)) == 0){
