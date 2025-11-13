@@ -22,7 +22,6 @@ int flags2perm(int flags)
 int
 exec(char *path, char **argv)
 {
-  // printf("entering exec\n");
   char *s, *last;
   int i, off;
   uint64 argc, sz = 0, sp, ustack[MAXARG], stackbase;
@@ -31,6 +30,7 @@ exec(char *path, char **argv)
   struct proghdr ph;
   pagetable_t pagetable = 0, oldpagetable;
   struct proc *p = myproc();
+  struct trapframe *old_trapframes[MAXTHREADS];
 
   begin_op();
 
@@ -47,6 +47,31 @@ exec(char *path, char **argv)
   if(elf.magic != ELF_MAGIC)
     goto bad;
 
+  // Save old trapframe pointers
+  for(int i = 0; i < MAXTHREADS; i++) {
+    old_trapframes[i] = p->thread[i].trapframe;
+  }
+
+  // Allocate NEW trapframe physical pages
+  for(int i = 0; i < MAXTHREADS; i++) {
+    p->thread[i].trapframe = (struct trapframe*)kalloc();
+    if(p->thread[i].trapframe == 0) {
+      // Cleanup on failure
+      for(int j = 0; j < i; j++) {
+        kfree((void*)p->thread[j].trapframe);
+        p->thread[j].trapframe = old_trapframes[j];
+      }
+      for(int j = i; j < MAXTHREADS; j++) {
+        p->thread[j].trapframe = old_trapframes[j];
+      }
+      iunlockput(ip);
+      end_op();
+      return -1;
+    }
+    memset(p->thread[i].trapframe, 0, PGSIZE);
+  }
+
+  // Now proc_pagetable will map the NEW trapframes
   if((pagetable = proc_pagetable(p)) == 0)
     goto bad;
 
@@ -76,43 +101,31 @@ exec(char *path, char **argv)
   p = myproc();
   uint64 oldsz = p->sz;
 
-  // Allocate two pages at the next page boundary.
-  // Make the first inaccessible as a stack guard.
-  // Use the second as the user stack.
   sz = PGROUNDUP(sz);
-  // uint64 sz1;
 
-  // CSE 536: (Task 2.1.1) - Allocate and map MAXTHREADS user stacks + guard pages according to the instructions
+  // Allocate MAXTHREADS user stacks with guard pages
   for(int i = 0; i < MAXTHREADS; i++){
     uint64 sz1;
+    // Guard page
     if((sz1 = uvmalloc(pagetable, sz, sz + PGSIZE, 0)) == 0)
       goto bad;
     sz = sz1;
     uvmclear(pagetable, sz - PGSIZE);
+    // Stack page
     if((sz1 = uvmalloc(pagetable, sz, sz + PGSIZE, PTE_W | PTE_R | PTE_U)) == 0)
       goto bad;
     sz = sz1;
   }
 
-  //writing bar for bar of old xv6 code
-
-  // for (int i=0; i< MAXTHREADS;i++){
-  //   uint64 sz1;
-  //   if((sz1 = uvmalloc(pagetable, sz, sz + 2*PGSIZE, PTE_W )) == 0)
-  //     goto bad;
-  //   sz = sz1;
-  //   uvmclear(pagetable, sz-2*PGSIZE);
-  // }
-
   sp = sz;
   stackbase = sp - PGSIZE;
 
-  // Push argument strings, prepare rest of stack in ustack.
+  // Push argument strings
   for(argc = 0; argv[argc]; argc++) {
     if(argc >= MAXARG)
       goto bad;
     sp -= strlen(argv[argc]) + 1;
-    sp -= sp % 16; // riscv sp must be 16-byte aligned
+    sp -= sp % 16;
     if(sp < stackbase)
       goto bad;
     if(copyout(pagetable, sp, argv[argc], strlen(argv[argc]) + 1) < 0)
@@ -121,7 +134,7 @@ exec(char *path, char **argv)
   }
   ustack[argc] = 0;
 
-  // push the array of argv[] pointers.
+  // Push argv[] pointers
   sp -= (argc+1) * sizeof(uint64);
   sp -= sp % 16;
   if(sp < stackbase)
@@ -129,47 +142,54 @@ exec(char *path, char **argv)
   if(copyout(pagetable, sp, (char *)ustack, (argc+1)*sizeof(uint64)) < 0)
     goto bad;
 
-  // arguments to user main(argc, argv)
-  // argc is returned via the system call return
-  // value, which goes in a0.
-  p->thread[0].trapframe->a1 = sp;
-
-  // Save program name for debugging.
+  // Save program name
   for(last=s=path; *s; s++)
     if(*s == '/')
       last = s+1;
   safestrcpy(p->name, last, sizeof(p->name));
     
-  // Commit to the user image.
+  // Commit to the user image
   oldpagetable = p->pagetable;
   p->pagetable = pagetable;
   p->sz = sz;
-  p->thread[0].trapframe->epc = elf.entry;  // initial program counter = main
 
-  // CSE 536: (Task 2.1.1) - set the correct user stack in the in each thread's trapframe
-  uint64 stacks_base = p->sz - (uint64)MAXTHREADS * 2 * PGSIZE;
-  for (int i = 0; i < MAXTHREADS; i++) {
-    uint64 stack_page = stacks_base + (uint64)(i * 2 + 1) * PGSIZE;
-    uint64 stack_top  = stack_page + PGSIZE;
-    // uint64 stack_top_2 = p->sz - (i * 2 * PGSIZE);
-    // printf("%p the stack top is , and the stack top 2 is %p\n", stack_top, stack_top_2);
+  // Initialize thread 0's NEW trapframe
+  p->thread[0].trapframe->epc = elf.entry;
+  p->thread[0].trapframe->sp = sz;
+  p->thread[0].trapframe->a1 = sp;
+  p->thread[0].trapframe->s11 = TRAPFRAME(0);
+
+  // Set stack pointers for other threads
+  for (int i = 1; i < MAXTHREADS; i++) {
+    uint64 stack_top = p->sz - (i * 2 * PGSIZE);
     p->thread[i].trapframe->sp = stack_top;
-    // p->thread[i].trapframe->epc = elf.entry;
-    // printf("this is what the sepc value is in %d %p\n",i,p->thread[i].trapframe->epc);
     p->thread[i].trapframe->s11 = TRAPFRAME(i);
+    p->thread[i].state = UNUSED;
   }
 
+  // Free old page table (this will free OLD trapframes with do_free=1)
   proc_freepagetable(oldpagetable, oldsz);
+  
+  // Free old trapframe physical pages
+  for(int i = 0; i < MAXTHREADS; i++) {
+    kfree((void*)old_trapframes[i]);
+  }
 
-  return argc; // this ends up in a0, the first argument to main(argc, argv)
+  return argc;
 
  bad:
-  printf("entered bad\n");
   if(pagetable)
     proc_freepagetable(pagetable, sz);
   if(ip){
     iunlockput(ip);
     end_op();
+  }
+  // Restore old trapframes on error
+  for(int i = 0; i < MAXTHREADS; i++) {
+    if(p->thread[i].trapframe != old_trapframes[i]) {
+      kfree((void*)p->thread[i].trapframe);
+      p->thread[i].trapframe = old_trapframes[i];
+    }
   }
   return -1;
 }
