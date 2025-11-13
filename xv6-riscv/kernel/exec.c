@@ -83,16 +83,22 @@ exec(char *path, char **argv)
   // uint64 sz1;
 
   // CSE 536: (Task 2.1.1) - Allocate and map MAXTHREADS user stacks + guard pages according to the instructions
-  for(int tid = 0; tid < MAXTHREADS; tid++){
-    uint64 sz1;
-    if((sz1 = uvmalloc(pagetable, sz, sz + PGSIZE, 0)) == 0)
-      goto bad;
-    sz = sz1;
-    uvmclear(pagetable, sz - PGSIZE);   
-    if((sz1 = uvmalloc(pagetable, sz, sz + PGSIZE, PTE_W | PTE_R | PTE_U)) == 0)
-      goto bad;
-    sz = sz1;
-  }
+for (int tid = 0; tid < MAXTHREADS; tid++) {
+    uint64 stack_guard = sz;                   // guard page
+    uint64 stack_page  = sz + PGSIZE;          // actual user stack
+
+    // Map guard page as inaccessible
+    if ((sz = uvmalloc(pagetable, sz, stack_guard, 0)) == 0)
+        goto bad;
+    uvmclear(pagetable, stack_guard);          // ensure guard page inaccessible
+
+    // Map actual stack page as readable/writable
+    if ((sz = uvmalloc(pagetable, stack_guard, stack_page + PGSIZE, PTE_W | PTE_R)) == 0)
+        goto bad;
+
+    // Set trapframe SP to top of stack page
+    p->thread[tid].trapframe->sp = stack_page + PGSIZE;
+}
 
   //writing bar for bar of old xv6 code
 
