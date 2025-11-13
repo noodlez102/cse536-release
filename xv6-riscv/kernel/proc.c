@@ -43,7 +43,7 @@ proc_mapstacks(pagetable_t kpgtbl)
       char *pa = kalloc();
       if (pa == 0)
         panic("proc_mapstacks: kalloc");
-      // memset(pa, 0, PGSIZE);
+      memset(pa, 0, PGSIZE);
       uint64 va = KSTACK((int) (p - proc), tid);
       kvmmap(kpgtbl, va, (uint64)pa, PGSIZE, PTE_R | PTE_W);
     }
@@ -239,8 +239,8 @@ proc_pagetable(struct proc *p)
   // printf("entering proc_pagetable\n");
 
   for(int i = 0; i < MAXTHREADS; i++) {
-    if (mappages(pagetable, TRAPFRAME(p->thread[i].tid), PGSIZE, (uint64)p->thread[i].trapframe, PTE_R | PTE_W | PTE_U) < 0) {
-      uvmunmap(pagetable, TRAMPOLINE, 1, 0);  
+    if (mappages(pagetable, TRAPFRAME(p->thread[i].tid), PGSIZE, (uint64)p->thread[i].trapframe, PTE_R | PTE_W ) < 0) {
+      uvmunmap(pagetable, TRAMPOLINE, 1, 1);  
       uvmfree(pagetable, 0);
       return 0;
     }
@@ -266,6 +266,7 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
       uint64 va = TRAPFRAME(i);
       uvmunmap(pagetable, va, 1, 1); 
       p->thread[i].trapframe=0;
+      p->thread[i].state=UNUSED;
     }
   }
   // printf("exiting proc_freepagetable\n");
