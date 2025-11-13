@@ -158,7 +158,7 @@ exec(char *path, char **argv)
     p->thread[i].trapframe->s11 = TRAPFRAME(i);
   }
 
-  proc_freepagetable(oldpagetable, oldsz);
+  //proc_freepagetable(oldpagetable, oldsz);
 
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 
