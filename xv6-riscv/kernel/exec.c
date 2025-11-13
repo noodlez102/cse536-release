@@ -89,7 +89,7 @@ exec(char *path, char **argv)
       goto bad;
     sz = sz1;
     uvmclear(pagetable, sz - PGSIZE);   
-    if((sz1 = uvmalloc(pagetable, sz, sz + PGSIZE, PTE_W | PTE_R | PTE_U)) == 0)
+    if((sz1 = uvmalloc(pagetable, sz, sz + PGSIZE, PTE_W | PTE_R )) == 0)
       goto bad;
     sz = sz1;
   }
