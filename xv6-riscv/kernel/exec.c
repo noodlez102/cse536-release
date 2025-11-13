@@ -145,7 +145,7 @@ exec(char *path, char **argv)
   p->pagetable = pagetable;
   p->sz = sz;
   p->thread[0].trapframe->epc = elf.entry;  // initial program counter = main
-
+  printf("this is what the sepc value is in 0 %p\n",p->thread[0].trapframe->epc);
   // CSE 536: (Task 2.1.1) - set the correct user stack in the in each thread's trapframe
   // uint64 stacks_base = p->sz - (uint64)MAXTHREADS * 2 * PGSIZE;
   for (int i = 0; i < MAXTHREADS; i++) {
@@ -154,7 +154,7 @@ exec(char *path, char **argv)
     uint64 stack_top_2 = p->sz - (i * 2 * PGSIZE+1);
     // printf("%p the stack top is , and the stack top 2 is %p\n", stack_top, stack_top_2);
     p->thread[i].trapframe->sp = stack_top_2;
-    // p->thread[i].trapframe->epc = elf.entry;
+    p->thread[i].trapframe->epc = elf.entry;
     p->thread[i].trapframe->s11 = TRAPFRAME(i);
   }
 
