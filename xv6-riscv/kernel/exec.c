@@ -156,6 +156,9 @@ exec(char *path, char **argv)
     // p->thread[i].trapframe->epc = elf.entry;
     // printf("this is what the sepc value is in %d %p\n",i,p->thread[i].trapframe->epc);
     p->thread[i].trapframe->s11 = TRAPFRAME(i);
+    if(i>=1){
+      p->thread[i].state = UNUSED;
+    }
   }
 
   proc_freepagetable(oldpagetable, oldsz);
