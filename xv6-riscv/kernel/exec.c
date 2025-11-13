@@ -171,22 +171,23 @@ exec(char *path, char **argv)
   p->thread[0].trapframe->epc = elf.entry;  // initial program counter = main
 
   // CSE 536: (Task 2.1.1) - set the correct user stack in the in each thread's trapframe
-  p->thread[0].trapframe->sp = sz;
-  p->thread[0].trapframe->a1 = sp;
-  p->thread[0].trapframe->s11 = TRAPFRAME(0);
-
-  // Set stack pointers for other threads
-  for (int i = 1; i < MAXTHREADS; i++) {
-    uint64 stack_top = p->sz - (i * 2 * PGSIZE);
+  uint64 stacks_base = p->sz - (uint64)MAXTHREADS * 2 * PGSIZE;
+  for (int i = 0; i < MAXTHREADS; i++) {
+    uint64 stack_page = stacks_base + (uint64)(i * 2 + 1) * PGSIZE;
+    uint64 stack_top  = stack_page + PGSIZE;
+    // uint64 stack_top_2 = p->sz - (i * 2 * PGSIZE);
+    // printf("%p the stack top is , and the stack top 2 is %p\n", stack_top, stack_top_2);
     p->thread[i].trapframe->sp = stack_top;
+    // p->thread[i].trapframe->epc = elf.entry;
+    // printf("this is what the sepc value is in %d %p\n",i,p->thread[i].trapframe->epc);
     p->thread[i].trapframe->s11 = TRAPFRAME(i);
-    p->thread[i].state = UNUSED;
   }
-  proc_freepagetable(oldpagetable, oldsz);
 
-  for(int i = 0; i < MAXTHREADS; i++) {
-    kfree((void*)old_trapframes[i]);
-  }
+  proc_freepagetable(oldpagetable, oldsz);
+  
+  // for(int i = 0; i < MAXTHREADS; i++) {
+  //   kfree((void*)old_trapframes[i]);
+  // }
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 
  bad:
