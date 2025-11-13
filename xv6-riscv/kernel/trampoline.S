@@ -140,7 +140,7 @@ userret:
         ld s8, 224(a0)
         ld s9, 232(a0)
         ld s10, 240(a0)
-        ; ld s11, 248(a0)
+        ld s11, 248(a0)
         ld t3, 256(a0)
         ld t4, 264(a0)
         ld t5, 272(a0)
