@@ -162,7 +162,7 @@ found:
       release(&p->lock);
       return 0;
     }
-    p->thread[tid].trapframe->epc = r_sepc();
+    // p->thread[tid].trapframe->epc = r_sepc();
     memset(p->thread[tid].trapframe, 0, PGSIZE);
   }
   // printf("exiting allocproc\n");
