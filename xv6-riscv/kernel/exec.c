@@ -48,26 +48,26 @@ exec(char *path, char **argv)
     goto bad;
   
   //cse 2.1.1 
-  for(int i = 0; i < MAXTHREADS; i++) {
-    old_trapframes[i] = p->thread[i].trapframe;
-  }
+  // for(int i = 0; i < MAXTHREADS; i++) {
+  //   old_trapframes[i] = p->thread[i].trapframe;
+  // }
 
-  for(int i = 0; i < MAXTHREADS; i++) {
-    p->thread[i].trapframe = (struct trapframe*)kalloc();
-    if(p->thread[i].trapframe == 0) {
-      for(int j = 0; j < i; j++) {
-        kfree((void*)p->thread[j].trapframe);
-        p->thread[j].trapframe = old_trapframes[j];
-      }
-      for(int j = i; j < MAXTHREADS; j++) {
-        p->thread[j].trapframe = old_trapframes[j];
-      }
-      iunlockput(ip);
-      end_op();
-      return -1;
-    }
-    memset(p->thread[i].trapframe, 0, PGSIZE);
-  }
+  // for(int i = 0; i < MAXTHREADS; i++) {
+  //   p->thread[i].trapframe = (struct trapframe*)kalloc();
+  //   if(p->thread[i].trapframe == 0) {
+  //     for(int j = 0; j < i; j++) {
+  //       kfree((void*)p->thread[j].trapframe);
+  //       p->thread[j].trapframe = old_trapframes[j];
+  //     }
+  //     for(int j = i; j < MAXTHREADS; j++) {
+  //       p->thread[j].trapframe = old_trapframes[j];
+  //     }
+  //     iunlockput(ip);
+  //     end_op();
+  //     return -1;
+  //   }
+  //   memset(p->thread[i].trapframe, 0, PGSIZE);
+  // }
 
   if((pagetable = proc_pagetable(p)) == 0)
     goto bad;
