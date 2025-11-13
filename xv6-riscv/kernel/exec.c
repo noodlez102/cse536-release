@@ -154,7 +154,7 @@ exec(char *path, char **argv)
     uint64 stack_page = stacks_base + (uint64)(i * 2 + 1) * PGSIZE;
     uint64 stack_top  = stack_page + PGSIZE;
     uint64 stack_top_2 = p->sz - i * 2 * PGSIZE;
-    printf("%p the stack top is , and the stack top 2 is %p", stack_top, stack_top_2);
+    printf("%p the stack top is , and the stack top 2 is %p\n", stack_top, stack_top_2);
     p->thread[i].trapframe->sp = stack_top;
   }
 
