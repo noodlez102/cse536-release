@@ -105,7 +105,7 @@ exec(char *path, char **argv)
   // uint64 sz1;
 
   // CSE 536: (Task 2.1.1) - Allocate and map MAXTHREADS user stacks + guard pages according to the instructions
-  for(int i = 0; i < MAXTHREADS; i++){
+  for(int i = 1; i < MAXTHREADS; i++){
     uint64 sz1;
     if((sz1 = uvmalloc(pagetable, sz, sz + PGSIZE, 0)) == 0)
       goto bad;
@@ -170,7 +170,7 @@ exec(char *path, char **argv)
 
   // CSE 536: (Task 2.1.1) - set the correct user stack in the in each thread's trapframe
   uint64 stacks_base = p->sz - (uint64)MAXTHREADS * 2 * PGSIZE;
-  for (int i = 0; i < MAXTHREADS; i++) {
+  for (int i = 1; i < MAXTHREADS; i++) {
     uint64 stack_page = stacks_base + (uint64)(i * 2 + 1) * PGSIZE;
     uint64 stack_top  = stack_page + PGSIZE;
     // uint64 stack_top_2 = p->sz - (i * 2 * PGSIZE);
