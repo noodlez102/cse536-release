@@ -83,28 +83,26 @@ exec(char *path, char **argv)
   // uint64 sz1;
 
   // CSE 536: (Task 2.1.1) - Allocate and map MAXTHREADS user stacks + guard pages according to the instructions
-  // for(int i = 0; i < MAXTHREADS; i++){
-  //   uint64 sz1;
-  //   if((sz1 = uvmalloc(pagetable, sz, sz + PGSIZE, 0)) == 0)
-  //     goto bad;
-  //   sz = sz1;
-  //   uvmclear(pagetable, sz - PGSIZE);
-  //   if((sz1 = uvmalloc(pagetable, sz, sz + PGSIZE, PTE_W | PTE_R | PTE_U)) == 0)
-  //     goto bad;
-  //   sz = sz1;
-  //   if(p->thread[i].trapframe)
-  //     p->thread[i].trapframe->sp = sz;
-  // }
+  for(int i = 0; i < MAXTHREADS; i++){
+    uint64 sz1;
+    if((sz1 = uvmalloc(pagetable, sz, sz + PGSIZE, 0)) == 0)
+      goto bad;
+    sz = sz1;
+    uvmclear(pagetable, sz - PGSIZE);
+    if((sz1 = uvmalloc(pagetable, sz, sz + PGSIZE, PTE_W | PTE_R | PTE_U)) == 0)
+      goto bad;
+    sz = sz1;
+  }
 
   //writing bar for bar of old xv6 code
 
-  for (int i=0; i< MAXTHREADS;i++){
-    uint64 sz1;
-    if((sz1 = uvmalloc(pagetable, sz, sz + 2*PGSIZE, PTE_W )) == 0)
-      goto bad;
-    sz = sz1;
-    uvmclear(pagetable, sz-2*PGSIZE);
-  }
+  // for (int i=0; i< MAXTHREADS;i++){
+  //   uint64 sz1;
+  //   if((sz1 = uvmalloc(pagetable, sz, sz + 2*PGSIZE, PTE_W )) == 0)
+  //     goto bad;
+  //   sz = sz1;
+  //   uvmclear(pagetable, sz-2*PGSIZE);
+  // }
 
   sp = sz;
   stackbase = sp - PGSIZE;
@@ -153,7 +151,7 @@ exec(char *path, char **argv)
   for (int i = 0; i < MAXTHREADS; i++) {
     // uint64 stack_page = stacks_base + (uint64)(i * 2 + 1) * PGSIZE;
     // uint64 stack_top  = stack_page + PGSIZE;
-    uint64 stack_top_2 = p->sz - i * 2 * PGSIZE;
+    uint64 stack_top_2 = p->sz - (i * 2 * PGSIZE+1);
     // printf("%p the stack top is , and the stack top 2 is %p\n", stack_top, stack_top_2);
     p->thread[i].trapframe->sp = stack_top_2;
     // p->thread[i].trapframe->epc = elf.entry;
