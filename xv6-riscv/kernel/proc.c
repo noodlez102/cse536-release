@@ -253,13 +253,13 @@ proc_pagetable(struct proc *p)
 void
 proc_freepagetable(pagetable_t pagetable, uint64 sz)
 {
-  // struct proc *p = 0;
-  // for (struct proc *pp = proc; pp < &proc[NPROC]; pp++) {
-  //   if (pp->pagetable == pagetable) {
-  //     p = pp;
-  //     break;
-  //   }
-  // }
+  struct proc *p = 0;
+  for (struct proc *pp = proc; pp < &proc[NPROC]; pp++) {
+    if (pp->pagetable == pagetable) {
+      p = pp;
+      break;
+    }
+  }
   uvmunmap(pagetable, TRAMPOLINE, 1, 0);
 
   // CSE 536: (Task 2.1.1) - unmap and free all the trapframes
@@ -267,8 +267,8 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
   // struct proc *p = myproc();
   for(int i = 0; i < MAXTHREADS; i++){
     uvmunmap(pagetable, TRAPFRAME(i), 1, 1); 
-    // p->thread[i].trapframe = 0;    
-    // p->thread[i].state = UNUSED;   
+    p->thread[i].trapframe = 0;    
+    p->thread[i].state = UNUSED;   
   }
   // printf("exiting proc_freepagetable\n");
   uvmfree(pagetable, sz); 
