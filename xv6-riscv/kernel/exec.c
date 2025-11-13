@@ -158,9 +158,7 @@ exec(char *path, char **argv)
     // printf("this is what the sepc value is in %d %p\n",i,p->thread[i].trapframe->epc);
     p->thread[i].trapframe->s11 = TRAPFRAME(i);
   }
-  p->thread[0].trapframe->sp = sz;
-  p->thread[0].trapframe->a1 = sp;
-  p->thread[0].trapframe->s11 = TRAPFRAME(0);
+
   proc_freepagetable(oldpagetable, oldsz);
 
   return argc; // this ends up in a0, the first argument to main(argc, argv)
