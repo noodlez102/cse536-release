@@ -152,8 +152,8 @@ found:
   // CSE 536: (Task 2.1.1) - Allocate MAXTHREAD trapframes
   // printf("entering allocproc\n");
   for(int tid = 0; tid < MAXTHREADS; tid++) {
-    p->thread[tid].tid = tid;
-    p->thread[tid].state = UNUSED;
+    // p->thread[tid].tid = tid;
+    // p->thread[tid].state = UNUSED;
     // p->thread[tid].priority = 0;
     // p->thread[tid].chan = 0;
     
@@ -237,7 +237,7 @@ proc_pagetable(struct proc *p)
   // printf("entering proc_pagetable\n");
 
   for(int i = 0; i < MAXTHREADS; i++) {
-    if (mappages(pagetable, TRAPFRAME(p->thread[i].tid), PGSIZE, (uint64)p->thread[i].trapframe, PTE_R | PTE_W ) < 0) {
+    if (mappages(pagetable, TRAPFRAME(i), PGSIZE, (uint64)p->thread[i].trapframe, PTE_R | PTE_W ) < 0) {
       uvmunmap(pagetable, TRAMPOLINE, 1, 0);  
       uvmfree(pagetable, 0);
       return 0;
