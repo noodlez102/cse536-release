@@ -43,7 +43,7 @@ void thread_create(uint64 entry_func, uint64 args[], int priority) {
     tf->a4 = args[4];
     tf->a5 = args[5];
 
-    uint64 user_stack_top = TRAPFRAME(t->tid) - PGSIZE;
+    uint64 user_stack_top = TRAPFRAME(t->tid);
     tf->sp = user_stack_top;
 
     memset(&(t->context), 0, sizeof(t->context));
