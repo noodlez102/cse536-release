@@ -185,8 +185,9 @@ exec(char *path, char **argv)
     // printf("this is what the sepc value is in %d %p\n",i,p->thread[i].trapframe->epc);
     // p->thread[i].trapframe->s11 = TRAPFRAME(i);
   // }
-
+  procdump();
   proc_freepagetable(oldpagetable, oldsz);
+  procdump();
 
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 
