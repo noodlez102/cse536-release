@@ -267,7 +267,7 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
   // CSE 536: (Task 2.1.1) - unmap and free all the trapframes
   // printf("entering proc_freepagetable\n");
   for(int i = 0; i < MAXTHREADS; i++){
-    uvmunmap(pagetable, TRAPFRAME(i), 2, 1); 
+    uvmunmap(pagetable, TRAPFRAME(i), 1, 1); 
     // p->thread[i].trapframe = 0;    
     // p->thread[i].state = UNUSED;   
   }
