@@ -118,7 +118,7 @@ exec(char *path, char **argv)
 
   //writing bar for bar of old xv6 code
 
-  for (int i=1; i< MAXTHREADS;i++){
+  for (int i=0; i< MAXTHREADS;i++){
     uint64 sz1;
     if((sz1 = uvmalloc(pagetable, sz, sz + 2*PGSIZE, PTE_W | PTE_R | PTE_U)) == 0)
       goto bad;
@@ -170,8 +170,10 @@ exec(char *path, char **argv)
 
   // CSE 536: (Task 2.1.1) - set the correct user stack in the in each thread's trapframe
   uint64 stacks_base = p->sz - (uint64)MAXTHREADS * 2 * PGSIZE;
+  printf("comparison vs mine and other stack base %p: mine, %p: theirs",stacks_base, stackbase);
   for (int i = 0; i < MAXTHREADS; i++) {
     uint64 stack_page = stacks_base + (uint64)(i * 2 + 1) * PGSIZE;
+  
     uint64 stack_top  = stack_page + PGSIZE;
     // uint64 stack_top_2 = p->sz - (i * 2 * PGSIZE);
     // printf("%p the stack top is , and the stack top 2 is %p\n", stack_top, stack_top_2);
