@@ -127,7 +127,6 @@ exec(char *path, char **argv)
   }
   // sz=personalOldsz;
   sp = sz;
-  printf("sp before everything %p\n",sp);
   stackbase = sp - PGSIZE;
 
   // Push argument strings, prepare rest of stack in ustack.
@@ -156,7 +155,7 @@ exec(char *path, char **argv)
   // argc is returned via the system call return
   // value, which goes in a0.
   p->thread[0].trapframe->a1 = sp;
-  printf("sp after everything %p\n",sp);
+  // printf("sp after everything %p\n",sp);
 
   // Save program name for debugging.
   for(last=s=path; *s; s++)
