@@ -174,17 +174,17 @@ exec(char *path, char **argv)
   // CSE 536: (Task 2.1.1) - set the correct user stack in the in each thread's trapframe
   // uint64 stacks_base = p->sz - (uint64)MAXTHREADS * 2 * PGSIZE;
   // printf("comparison vs mine and other stack base %p: mine, %p: theirs\n",stacks_base, stackbase);
-  for (int i = 0; i < MAXTHREADS; i++) {
+  // for (int i = 0; i < MAXTHREADS; i++) {
     // uint64 stack_page = stackbase + (uint64)(i * 2 + 1) * PGSIZE;
   
     // uint64 stack_top  = stack_page + PGSIZE;
     // uint64 stack_top_2 = p->sz - (i * 2 * PGSIZE);
     // printf("%p the stack top is , and the stack top 2 is %p\n", stack_top, stack_top_2);
-    p->thread[i].trapframe->sp = sp;
+    p->thread[0].trapframe->sp = sp;
     // p->thread[i].trapframe->epc = elf.entry;
     // printf("this is what the sepc value is in %d %p\n",i,p->thread[i].trapframe->epc);
     // p->thread[i].trapframe->s11 = TRAPFRAME(i);
-  }
+  // }
 
   proc_freepagetable(oldpagetable, oldsz);
 
