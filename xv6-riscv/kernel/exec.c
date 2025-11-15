@@ -130,6 +130,7 @@ exec(char *path, char **argv)
   }
 
   sp = personalOldsz;
+  sz=personalOldsz;
   stackbase = sp - PGSIZE;
 
   // Push argument strings, prepare rest of stack in ustack.
