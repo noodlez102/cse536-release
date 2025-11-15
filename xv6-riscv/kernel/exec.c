@@ -120,7 +120,7 @@ exec(char *path, char **argv)
   // uint64 personalOldsz=0;
   for (int i=0; i< MAXTHREADS;i++){
     uint64 sz1;
-    if((sz1 = uvmalloc(pagetable, sz, sz + 2*PGSIZE, PTE_W | PTE_U)) == 0)
+    if((sz1 = uvmalloc(pagetable, sz, sz + 2*PGSIZE, PTE_W | PTE_U | PTE_R)) == 0)
       goto bad;
     sz = sz1;
     uvmclear(pagetable, sz-2*PGSIZE);
