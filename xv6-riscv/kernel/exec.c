@@ -118,7 +118,7 @@ exec(char *path, char **argv)
 
   //writing bar for bar of old xv6 code
 
-  for (int i=0; i< MAXTHREADS;i++){
+  for (int i=1; i< MAXTHREADS;i++){
     uint64 sz1;
     if((sz1 = uvmalloc(pagetable, sz, sz + 2*PGSIZE, PTE_W | PTE_R | PTE_U)) == 0)
       goto bad;
