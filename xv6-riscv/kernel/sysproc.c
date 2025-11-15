@@ -95,6 +95,21 @@ uint64
 sys_thread_create(void)
 {
   // CSE 536: (Task 2.2.1) - Handle argument passing for thread_create()
+  uint64 start_func;
+  uint64 args_ptr;
+  int priority;      
+  uint64 args[6];
+  
+  argaddr(0, &start_func);
+  argaddr(1, &args_ptr);
+  
+  argint(2, &priority);
+
+  struct proc *p = myproc();
+  if(copyin(p->pagetable, (char*)args, args_ptr, sizeof(uint64) * 6) < 0)
+    return -1;
+  
+  thread_create(start_func, args, priority);
   return 0;
 }
 
