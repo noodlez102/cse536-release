@@ -117,7 +117,7 @@ exec(char *path, char **argv)
   // }
 
   //writing bar for bar of old xv6 code
-  uint64 oldsz=0;
+  uint64 personalOldsz=0;
   for (int i=0; i< MAXTHREADS;i++){
     uint64 sz1;
     if((sz1 = uvmalloc(pagetable, sz, sz + 2*PGSIZE, PTE_W )) == 0)
@@ -125,11 +125,11 @@ exec(char *path, char **argv)
     sz = sz1;
     uvmclear(pagetable, sz-2*PGSIZE);
     if(i==0){
-      oldsz=sz;
+      personalOldsz=sz;
     }
   }
 
-  sp = oldsz;
+  sp = personalOldsz;
   stackbase = sp - PGSIZE;
 
   // Push argument strings, prepare rest of stack in ustack.
