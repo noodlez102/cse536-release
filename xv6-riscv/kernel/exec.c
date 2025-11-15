@@ -178,7 +178,7 @@ exec(char *path, char **argv)
     // uint64 stack_top  = stack_page + PGSIZE;
     // uint64 stack_top_2 = p->sz - (i * 2 * PGSIZE);
     // printf("%p the stack top is , and the stack top 2 is %p\n", stack_top, stack_top_2);
-    p->thread[i].trapframe->sp = sp-PGSIZE*i;
+    p->thread[i].trapframe->sp = sp-PGSIZE*i*2;
     p->thread[i].trapframe->s11 = TRAPFRAME(i);
     // p->thread[i].trapframe->epc = elf.entry;
     // printf("this is what the sepc value is in %d %p\n",i,p->thread[i].trapframe->epc);
