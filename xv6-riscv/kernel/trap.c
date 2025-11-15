@@ -52,7 +52,7 @@ usertrap(void)
   
   if(r_scause() == 8){
     // system call
-    printf("r_scause =8\n");
+    
     if(killed(p))
       exit(-1);
 

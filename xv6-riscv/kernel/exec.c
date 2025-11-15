@@ -118,18 +118,16 @@ exec(char *path, char **argv)
 
   //writing bar for bar of old xv6 code
   // uint64 personalOldsz=0;
-  for (int i=0; i< MAXTHREADS;i++){
     uint64 sz1;
-    if((sz1 = uvmalloc(pagetable, sz, sz + 2*PGSIZE, PTE_W | PTE_U | PTE_R)) == 0)
+    if((sz1 = uvmalloc(pagetable, sz, sz + 2*PGSIZE*MAXTHREADS, PTE_W )) == 0)
       goto bad;
     sz = sz1;
-    uvmclear(pagetable, sz-2*PGSIZE);
-    // if(i==0){
-    //   personalOldsz=sz;
-    // }
+  for (int i=0; i< MAXTHREADS;i++){
+    uvmclear(pagetable, sz-2*PGSIZE*i);
   }
   // sz=personalOldsz;
   sp = sz;
+  printf("sp before everything %p\n",sp);
   stackbase = sp - PGSIZE;
 
   // Push argument strings, prepare rest of stack in ustack.
@@ -158,6 +156,7 @@ exec(char *path, char **argv)
   // argc is returned via the system call return
   // value, which goes in a0.
   p->thread[0].trapframe->a1 = sp;
+  printf("sp after everything %p\n",sp);
 
   // Save program name for debugging.
   for(last=s=path; *s; s++)
