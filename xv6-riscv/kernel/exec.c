@@ -118,7 +118,7 @@ exec(char *path, char **argv)
 
   //writing bar for bar of old xv6 code
   // uint64 personalOldsz=0;
-  for (int i=0; i< MAXTHREADS;i++){
+  // for (int i=0; i< MAXTHREADS;i++){
     uint64 sz1;
     if((sz1 = uvmalloc(pagetable, sz, sz + 2*PGSIZE, PTE_W | PTE_U | PTE_R)) == 0)
       goto bad;
@@ -127,7 +127,7 @@ exec(char *path, char **argv)
     // if(i==0){
     //   personalOldsz=sz;
     // }
-  }
+  // }
   // sz=personalOldsz;
   sp = sz;
   stackbase = sp - PGSIZE;
