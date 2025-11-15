@@ -170,7 +170,7 @@ exec(char *path, char **argv)
 
   // CSE 536: (Task 2.1.1) - set the correct user stack in the in each thread's trapframe
   // uint64 stacks_base = p->sz - (uint64)MAXTHREADS * 2 * PGSIZE;
-  printf("comparison vs mine and other stack base %p: mine, %p: theirs\n",stacks_base, stackbase);
+  // printf("comparison vs mine and other stack base %p: mine, %p: theirs\n",stacks_base, stackbase);
   for (int i = 0; i < MAXTHREADS; i++) {
     uint64 stack_page = stackbase + (uint64)(i * 2 + 1) * PGSIZE;
   
