@@ -118,10 +118,10 @@ exec(char *path, char **argv)
 
   //writing bar for bar of old xv6 code
   // uint64 personalOldsz=0;
-    uint64 sz1;
-    if((sz1 = uvmalloc(pagetable, sz, sz + 2*PGSIZE*MAXTHREADS, PTE_W | PTE_V)) == 0)
-      goto bad;
-    sz = sz1;
+  uint64 sz1;
+  if((sz1 = uvmalloc(pagetable, sz, sz + 2*PGSIZE*MAXTHREADS, PTE_W )) == 0)
+    goto bad;
+  sz = sz1;
   for (int i=0; i< MAXTHREADS;i++){
     uvmclear(pagetable, sz-2*PGSIZE*i);
   }
